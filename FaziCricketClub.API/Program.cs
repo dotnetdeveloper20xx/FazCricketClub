@@ -1,24 +1,19 @@
-using FaziCricketClub.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using FaziCricketClub.Application;
+using FaziCricketClub.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Add controllers (we are using full Web API controllers).
 builder.Services.AddControllers();
-
-// Add Swagger/OpenAPI.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure EF Core DbContext.
-var connectionString = builder.Configuration.GetConnectionString("CricketClubDatabase");
+// Register application-layer services.
+builder.Services.AddApplication();
 
-builder.Services.AddDbContext<CricketClubDbContext>(options =>
-{
-    options.UseSqlServer(connectionString);
-});
+// Register infrastructure-layer services (DbContext, repositories, etc.).
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -33,9 +28,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Map attribute-routed controllers.
 app.MapControllers();
 
 app.Run();
-
-
-
