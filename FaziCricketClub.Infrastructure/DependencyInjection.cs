@@ -1,10 +1,13 @@
-﻿using FaziCricketClub.Infrastructure.Persistence;
+﻿using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Infrastructure.Persistence;
+using FaziCricketClub.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FaziCricketClub.Infrastructure
 {
+    /// <summary>
     /// Provides extension methods to register infrastructure services
     /// such as the EF Core DbContext, repositories, and external integrations.
     /// </summary>
@@ -28,8 +31,13 @@ namespace FaziCricketClub.Infrastructure
                 options.UseSqlServer(connectionString);
             });
 
-            // TODO: Register repositories, external services, etc.
-            // e.g. services.AddScoped<IMemberRepository, MemberRepository>();
+            // Unit of Work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Repositories
+            services.AddScoped<ISeasonRepository, SeasonRepository>();
+
+            // TODO: Register other repositories here as we add them.
 
             return services;
         }

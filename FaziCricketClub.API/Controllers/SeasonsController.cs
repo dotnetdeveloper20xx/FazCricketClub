@@ -1,6 +1,6 @@
 ﻿using FaziCricketClub.API.Models;
-using FaziCricketClub.Domain.Entities;
-using FaziCricketClub.Infrastructure.Persistence;
+using FaziCricketClub.Application.Dtos;
+using FaziCricketClub.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,150 +8,107 @@ namespace FaziCricketClub.API.Controllers
 {
     /// <summary>
     /// Manages seasons in the CricketClub system.
-    /// This is our first "real" CRUD controller backed by EF Core and SQL.
+    /// This controller is intentionally thin and delegates to the application layer.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class SeasonsController : ControllerBase
     {
-        private readonly CricketClubDbContext _dbContext;
+        private readonly ISeasonService _seasonService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SeasonsController"/> class.
-        /// </summary>
-        /// <param name="dbContext">The EF Core DbContext for CricketClub.</param>
-        public SeasonsController(CricketClubDbContext dbContext)
+        public SeasonsController(ISeasonService seasonService)
         {
-            _dbContext = dbContext;
+            _seasonService = seasonService;
         }
 
         /// <summary>
         /// Gets all seasons.
         /// </summary>
-        /// <returns>A list of seasons.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SeasonDto>>> GetAllAsync()
+        public async Task<ActionResult<ApiResponse<IEnumerable<SeasonDto>>>> GetAllAsync(CancellationToken cancellationToken)
         {
-            var seasons = await _dbContext.Seasons
-                .OrderBy(s => s.StartDate)
-                .Select(s => new SeasonDto
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Description = s.Description,
-                    StartDate = s.StartDate,
-                    EndDate = s.EndDate
-                })
-                .ToListAsync();
+            var seasons = await _seasonService.GetAllAsync(cancellationToken);
 
-            return Ok(seasons);
+            var response = ApiResponse<IEnumerable<SeasonDto>>.Ok(seasons);
+            return Ok(response);
         }
 
         /// <summary>
         /// Gets a single season by its identifier.
         /// </summary>
-        /// <param name="id">The season identifier.</param>
-        /// <returns>The requested season, if found.</returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<SeasonDto>> GetByIdAsync(int id)
+        public async Task<ActionResult<ApiResponse<SeasonDto>>> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var season = await _dbContext.Seasons
-                .Where(s => s.Id == id)
-                .Select(s => new SeasonDto
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Description = s.Description,
-                    StartDate = s.StartDate,
-                    EndDate = s.EndDate
-                })
-                .SingleOrDefaultAsync();
+            var season = await _seasonService.GetByIdAsync(id, cancellationToken);
 
             if (season == null)
             {
-                return NotFound();
+                // Use ProblemDetails for 404.
+                return NotFound(Problem(
+                    detail: $"Season with id {id} was not found.",
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Season not found"));
             }
 
-            return Ok(season);
+            var response = ApiResponse<SeasonDto>.Ok(season);
+            return Ok(response);
         }
 
         /// <summary>
         /// Creates a new season.
         /// </summary>
-        /// <param name="request">The season details to create.</param>
-        /// <returns>The created season.</returns>
         [HttpPost]
-        public async Task<ActionResult<SeasonDto>> CreateAsync([FromBody] CreateSeasonDto request)
+        public async Task<ActionResult<ApiResponse<SeasonDto>>> CreateAsync(
+            [FromBody] CreateSeasonDto request,
+            CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
-            // Basic validation: start date should be before end date.
             if (request.StartDate > request.EndDate)
             {
                 ModelState.AddModelError(nameof(request.EndDate), "End date must be after start date.");
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
-            var season = new Season
-            {
-                Name = request.Name,
-                Description = request.Description,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate
-            };
+            var created = await _seasonService.CreateAsync(request, cancellationToken);
 
-            _dbContext.Seasons.Add(season);
-            await _dbContext.SaveChangesAsync();
+            var response = ApiResponse<SeasonDto>.Ok(created, "Season created successfully.");
 
-            var result = new SeasonDto
-            {
-                Id = season.Id,
-                Name = season.Name,
-                Description = season.Description,
-                StartDate = season.StartDate,
-                EndDate = season.EndDate
-            };
-
-            // Returns 201 Created with a Location header pointing to GetById.
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = season.Id }, result);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = created.Id }, response);
         }
 
         /// <summary>
         /// Updates an existing season.
         /// </summary>
-        /// <param name="id">The identifier of the season to update.</param>
-        /// <param name="request">The updated season details.</param>
-        /// <returns>No content on success.</returns>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateSeasonDto request)
+        public async Task<IActionResult> UpdateAsync(
+            int id,
+            [FromBody] UpdateSeasonDto request,
+            CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
             if (request.StartDate > request.EndDate)
             {
                 ModelState.AddModelError(nameof(request.EndDate), "End date must be after start date.");
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
-            var season = await _dbContext.Seasons.FindAsync(id);
+            var updated = await _seasonService.UpdateAsync(id, request, cancellationToken);
 
-            if (season == null)
+            if (!updated)
             {
-                return NotFound();
+                return NotFound(Problem(
+                    detail: $"Season with id {id} was not found.",
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Season not found"));
             }
-
-            season.Name = request.Name;
-            season.Description = request.Description;
-            season.StartDate = request.StartDate;
-            season.EndDate = request.EndDate;
-
-            await _dbContext.SaveChangesAsync();
 
             return NoContent();
         }
@@ -159,20 +116,18 @@ namespace FaziCricketClub.API.Controllers
         /// <summary>
         /// Deletes an existing season.
         /// </summary>
-        /// <param name="id">The identifier of the season to delete.</param>
-        /// <returns>No content on success.</returns>
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var season = await _dbContext.Seasons.FindAsync(id);
+            var deleted = await _seasonService.DeleteAsync(id, cancellationToken);
 
-            if (season == null)
+            if (!deleted)
             {
-                return NotFound();
+                return NotFound(Problem(
+                    detail: $"Season with id {id} was not found.",
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Season not found"));
             }
-
-            _dbContext.Seasons.Remove(season);
-            await _dbContext.SaveChangesAsync();
 
             return NoContent();
         }

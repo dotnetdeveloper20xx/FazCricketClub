@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Application.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FaziCricketClub.Application
 {
@@ -15,8 +17,10 @@ namespace FaziCricketClub.Application
         /// <returns>The same service collection, for chaining.</returns>
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // TODO: Register MediatR handlers, validators, application services, etc.
-            // e.g. services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+            // Application services
+            services.AddScoped<ISeasonService, SeasonService>();
+
+            // TODO: Register MediatR, validators, other services here later.
 
             return services;
         }

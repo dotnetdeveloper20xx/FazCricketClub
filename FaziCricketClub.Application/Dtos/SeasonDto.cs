@@ -1,4 +1,4 @@
-﻿namespace FaziCricketClub.API.Models
+﻿namespace FaziCricketClub.Application.Dtos
 {
     /// <summary>
     /// DTO used when returning a season from the API.

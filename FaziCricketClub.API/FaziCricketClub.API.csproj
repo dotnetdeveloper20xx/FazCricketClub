@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FaziCricketClub.Application\FaziCricketClub.Application.csproj" />
     <ProjectReference Include="..\FaziCricketClub.Infrastructure\FaziCricketClub.Infrastructure.csproj" />
   </ItemGroup>
 
