@@ -1,4 +1,5 @@
-﻿using FaziCricketClub.Application.Dtos;
+﻿using AutoMapper;
+using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
 using FaziCricketClub.Domain.Entities;
 
@@ -6,34 +7,32 @@ namespace FaziCricketClub.Application.Services
 {
     /// <summary>
     /// Default implementation of <see cref="ISeasonService"/>.
-    /// Uses repositories and unit of work to perform operations.
+    /// Coordinates repositories, unit of work, and mappings.
     /// </summary>
     public class SeasonService : ISeasonService
     {
         private readonly ISeasonRepository _seasonRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public SeasonService(ISeasonRepository seasonRepository, IUnitOfWork unitOfWork)
+        public SeasonService(
+            ISeasonRepository seasonRepository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _seasonRepository = seasonRepository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<List<SeasonDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var seasons = await _seasonRepository.GetAllAsync(cancellationToken);
 
-            return seasons
-                .OrderBy(s => s.StartDate)
-                .Select(s => new SeasonDto
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Description = s.Description,
-                    StartDate = s.StartDate,
-                    EndDate = s.EndDate
-                })
-                .ToList();
+            // Keep ordering explicit, then map.
+            var ordered = seasons.OrderBy(s => s.StartDate).ToList();
+
+            return _mapper.Map<List<SeasonDto>>(ordered);
         }
 
         public async Task<SeasonDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -45,37 +44,20 @@ namespace FaziCricketClub.Application.Services
                 return null;
             }
 
-            return new SeasonDto
-            {
-                Id = season.Id,
-                Name = season.Name,
-                Description = season.Description,
-                StartDate = season.StartDate,
-                EndDate = season.EndDate
-            };
+            return _mapper.Map<SeasonDto>(season);
         }
 
         public async Task<SeasonDto> CreateAsync(CreateSeasonDto request, CancellationToken cancellationToken = default)
         {
-            var season = new Season
-            {
-                Name = request.Name,
-                Description = request.Description,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate
-            };
+            // Map DTO -> entity
+            var season = _mapper.Map<Season>(request);
 
             await _seasonRepository.AddAsync(season, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new SeasonDto
-            {
-                Id = season.Id,
-                Name = season.Name,
-                Description = season.Description,
-                StartDate = season.StartDate,
-                EndDate = season.EndDate
-            };
+            // Map entity -> DTO (with generated Id)
+            var result = _mapper.Map<SeasonDto>(season);
+            return result;
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateSeasonDto request, CancellationToken cancellationToken = default)
@@ -87,10 +69,8 @@ namespace FaziCricketClub.Application.Services
                 return false;
             }
 
-            season.Name = request.Name;
-            season.Description = request.Description;
-            season.StartDate = request.StartDate;
-            season.EndDate = request.EndDate;
+            // Map updated fields onto existing entity.
+            _mapper.Map(request, season);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;

@@ -1,5 +1,7 @@
-﻿using FaziCricketClub.Application.Dtos;
+﻿using AutoMapper;
+using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Application.Mapping;
 using FaziCricketClub.Application.Services;
 using FaziCricketClub.Domain.Entities;
 using FluentAssertions;
@@ -11,6 +13,7 @@ namespace FaziCricketClub.Tests.Unit
     {
         private readonly Mock<ISeasonRepository> _seasonRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly IMapper _mapper;
         private readonly SeasonService _sut; // System Under Test
 
         public SeasonServiceTests()
@@ -18,7 +21,18 @@ namespace FaziCricketClub.Tests.Unit
             _seasonRepositoryMock = new Mock<ISeasonRepository>(MockBehavior.Strict);
             _unitOfWorkMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
 
-            _sut = new SeasonService(_seasonRepositoryMock.Object, _unitOfWorkMock.Object);
+            // Configure AutoMapper with our real profile
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CricketClubMappingProfile>();
+            }, null);
+
+            _mapper = config.CreateMapper();
+
+            _sut = new SeasonService(
+                _seasonRepositoryMock.Object,
+                _unitOfWorkMock.Object,
+                _mapper);
         }
 
         [Fact]

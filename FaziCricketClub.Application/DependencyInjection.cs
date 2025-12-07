@@ -1,4 +1,5 @@
 ﻿using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Application.Mapping;
 using FaziCricketClub.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,11 @@ namespace FaziCricketClub.Application
         /// <returns>The same service collection, for chaining.</returns>
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+
+            // AutoMapper: scan the assembly that contains CricketClubMappingProfile
+            services.AddAutoMapper(typeof(CricketClubMappingProfile).Assembly);
+
+
             // Application services
             services.AddScoped<ISeasonService, SeasonService>();
             services.AddScoped<ITeamService, TeamService>();

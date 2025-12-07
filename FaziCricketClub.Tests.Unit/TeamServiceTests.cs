@@ -1,5 +1,7 @@
-﻿using FaziCricketClub.Application.Dtos;
+﻿using AutoMapper;
+using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Application.Mapping;
 using FaziCricketClub.Application.Services;
 using FaziCricketClub.Domain.Entities;
 using FluentAssertions;
@@ -16,6 +18,7 @@ namespace FaziCricketClub.Tests.Unit
     {
         private readonly Mock<ITeamRepository> _teamRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly IMapper _mapper;
         private readonly TeamService _sut; // System Under Test
 
         public TeamServiceTests()
@@ -23,7 +26,17 @@ namespace FaziCricketClub.Tests.Unit
             _teamRepositoryMock = new Mock<ITeamRepository>(MockBehavior.Strict);
             _unitOfWorkMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
 
-            _sut = new TeamService(_teamRepositoryMock.Object, _unitOfWorkMock.Object);
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CricketClubMappingProfile>();
+            }, null);
+
+            _mapper = config.CreateMapper();
+
+            _sut = new TeamService(
+                _teamRepositoryMock.Object,
+                _unitOfWorkMock.Object,
+                _mapper);
         }
 
         [Fact]
