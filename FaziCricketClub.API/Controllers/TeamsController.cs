@@ -52,13 +52,10 @@ namespace FaziCricketClub.API.Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Creates a new team.
-        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ApiResponse<TeamDto>>> CreateAsync(
-            [FromBody] CreateTeamDto request,
-            CancellationToken cancellationToken)
+      [FromBody] CreateTeamDto request,
+      CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
@@ -66,15 +63,11 @@ namespace FaziCricketClub.API.Controllers
             }
 
             var created = await _teamService.CreateAsync(request, cancellationToken);
-
             var response = ApiResponse<TeamDto>.Ok(created, "Team created successfully.");
 
             return CreatedAtAction(nameof(GetByIdAsync), new { id = created.Id }, response);
         }
 
-        /// <summary>
-        /// Updates an existing team.
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(
             int id,
@@ -98,6 +91,7 @@ namespace FaziCricketClub.API.Controllers
 
             return NoContent();
         }
+
 
         /// <summary>
         /// Deletes an existing team.

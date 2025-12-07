@@ -55,9 +55,6 @@ namespace FaziCricketClub.API.Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Creates a new fixture.
-        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ApiResponse<FixtureDto>>> CreateAsync(
             [FromBody] CreateFixtureDto request,
@@ -68,22 +65,12 @@ namespace FaziCricketClub.API.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            if (request.HomeTeamId == request.AwayTeamId)
-            {
-                ModelState.AddModelError(nameof(request.AwayTeamId), "Home and away team cannot be the same.");
-                return ValidationProblem(ModelState);
-            }
-
             var created = await _fixtureService.CreateAsync(request, cancellationToken);
-
             var response = ApiResponse<FixtureDto>.Ok(created, "Fixture created successfully.");
 
             return CreatedAtAction(nameof(GetByIdAsync), new { id = created.Id }, response);
         }
 
-        /// <summary>
-        /// Updates an existing fixture.
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(
             int id,
@@ -92,12 +79,6 @@ namespace FaziCricketClub.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ValidationProblem(ModelState);
-            }
-
-            if (request.HomeTeamId == request.AwayTeamId)
-            {
-                ModelState.AddModelError(nameof(request.AwayTeamId), "Home and away team cannot be the same.");
                 return ValidationProblem(ModelState);
             }
 
@@ -113,6 +94,7 @@ namespace FaziCricketClub.API.Controllers
 
             return NoContent();
         }
+
 
         /// <summary>
         /// Deletes an existing fixture (soft delete).

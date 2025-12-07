@@ -55,9 +55,6 @@ namespace FaziCricketClub.API.Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Creates a new member.
-        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ApiResponse<MemberDto>>> CreateAsync(
             [FromBody] CreateMemberDto request,
@@ -68,29 +65,12 @@ namespace FaziCricketClub.API.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            // (Optional) Simple check – you might later add more validation or FluentValidation.
-            if (string.IsNullOrWhiteSpace(request.FullName))
-            {
-                ModelState.AddModelError(nameof(request.FullName), "Full name is required.");
-                return ValidationProblem(ModelState);
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Email))
-            {
-                ModelState.AddModelError(nameof(request.Email), "Email is required.");
-                return ValidationProblem(ModelState);
-            }
-
             var created = await _memberService.CreateAsync(request, cancellationToken);
-
             var response = ApiResponse<MemberDto>.Ok(created, "Member created successfully.");
 
             return CreatedAtAction(nameof(GetByIdAsync), new { id = created.Id }, response);
         }
 
-        /// <summary>
-        /// Updates an existing member.
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(
             int id,
@@ -99,18 +79,6 @@ namespace FaziCricketClub.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ValidationProblem(ModelState);
-            }
-
-            if (string.IsNullOrWhiteSpace(request.FullName))
-            {
-                ModelState.AddModelError(nameof(request.FullName), "Full name is required.");
-                return ValidationProblem(ModelState);
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Email))
-            {
-                ModelState.AddModelError(nameof(request.Email), "Email is required.");
                 return ValidationProblem(ModelState);
             }
 
@@ -126,6 +94,7 @@ namespace FaziCricketClub.API.Controllers
 
             return NoContent();
         }
+
 
         /// <summary>
         /// Deletes an existing member (soft delete).

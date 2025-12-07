@@ -54,22 +54,13 @@ namespace FaziCricketClub.API.Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Creates a new season.
-        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ApiResponse<SeasonDto>>> CreateAsync(
-            [FromBody] CreateSeasonDto request,
-            CancellationToken cancellationToken)
+     [FromBody] CreateSeasonDto request,
+     CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
-                return ValidationProblem(ModelState);
-            }
-
-            if (request.StartDate > request.EndDate)
-            {
-                ModelState.AddModelError(nameof(request.EndDate), "End date must be after start date.");
                 return ValidationProblem(ModelState);
             }
 
@@ -80,9 +71,6 @@ namespace FaziCricketClub.API.Controllers
             return CreatedAtAction(nameof(GetByIdAsync), new { id = created.Id }, response);
         }
 
-        /// <summary>
-        /// Updates an existing season.
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(
             int id,
@@ -91,12 +79,6 @@ namespace FaziCricketClub.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ValidationProblem(ModelState);
-            }
-
-            if (request.StartDate > request.EndDate)
-            {
-                ModelState.AddModelError(nameof(request.EndDate), "End date must be after start date.");
                 return ValidationProblem(ModelState);
             }
 
@@ -112,6 +94,7 @@ namespace FaziCricketClub.API.Controllers
 
             return NoContent();
         }
+
 
         /// <summary>
         /// Deletes an existing season.

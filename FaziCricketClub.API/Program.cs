@@ -1,5 +1,7 @@
 using FaziCricketClub.Application;
+using FaziCricketClub.Application.Validation.Seasons;
 using FaziCricketClub.Infrastructure;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Automatically register all validators in the Application assembly
+builder.Services.AddValidatorsFromAssemblyContaining<CreateSeasonDtoValidator>();
 
 // Register application-layer services.
 builder.Services.AddApplication();
