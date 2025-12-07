@@ -37,6 +37,7 @@ namespace FaziCricketClub.Infrastructure
             // Repositories
             services.AddScoped<ISeasonRepository, SeasonRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
+            services.AddScoped<IMemberRepository, MemberRepository>();
 
             // TODO: Register other repositories here as we add them.
 
