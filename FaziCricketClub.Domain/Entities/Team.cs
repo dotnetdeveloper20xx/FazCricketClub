@@ -26,6 +26,12 @@
         public bool IsActive { get; set; } = true;
 
         /// <summary>
+        /// Indicates that the row has been soft deleted.
+        /// True means logically deleted; it should not appear in normal queries.
+        /// </summary>
+        public bool IsDeleted { get; set; } = false;
+
+        /// <summary>
         /// Members associated with this team (many-to-many with Member).
         /// </summary>
         public ICollection<Member> Members { get; set; } = new List<Member>();

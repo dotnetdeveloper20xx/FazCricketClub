@@ -52,14 +52,18 @@
 
         /// <summary>
         /// Text description of the competition (league, cup, friendly).
-        /// Later we might extract this to a dedicated Competition entity.
         /// </summary>
         public string CompetitionName { get; set; } = string.Empty;
 
         /// <summary>
         /// Current status of the fixture (Scheduled, Completed, Abandoned, etc.).
-        /// For now we store it as text; later we could introduce an enum.
         /// </summary>
         public string Status { get; set; } = "Scheduled";
+
+        /// <summary>
+        /// Indicates that the row has been soft deleted.
+        /// True means logically deleted; it should not appear in normal queries.
+        /// </summary>
+        public bool IsDeleted { get; set; } = false;
     }
 }

@@ -32,6 +32,12 @@
         public DateTime EndDate { get; set; }
 
         /// <summary>
+        /// Indicates that the row has been soft deleted.
+        /// True means logically deleted; it should not appear in normal queries.
+        /// </summary>
+        public bool IsDeleted { get; set; } = false;
+
+        /// <summary>
         /// Fixtures that belong to this season.
         /// </summary>
         public ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();

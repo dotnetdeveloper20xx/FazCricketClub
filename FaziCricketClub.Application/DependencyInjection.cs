@@ -19,6 +19,7 @@ namespace FaziCricketClub.Application
         {
             // Application services
             services.AddScoped<ISeasonService, SeasonService>();
+            services.AddScoped<ITeamService, TeamService>();
 
             // TODO: Register MediatR, validators, other services here later.
 

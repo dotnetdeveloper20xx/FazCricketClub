@@ -28,7 +28,9 @@ namespace FaziCricketClub.Infrastructure.Configurations
             builder.Property(f => f.StartDateTime)
                    .IsRequired();
 
-            // Relationships
+            builder.Property(f => f.IsDeleted)
+                   .HasDefaultValue(false);
+
             builder.HasOne(f => f.Season)
                    .WithMany(s => s.Fixtures)
                    .HasForeignKey(f => f.SeasonId)

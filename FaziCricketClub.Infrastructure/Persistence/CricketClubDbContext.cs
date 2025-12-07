@@ -47,10 +47,14 @@ namespace FaziCricketClub.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            // Automatically apply all IEntityTypeConfiguration<> implementations
-            // from the current assembly. This keeps the context clean and
-            // makes it easy to add new entity configurations.
+            // Apply entity configurations.
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(CricketClubDbContext).Assembly);
+
+            // Global query filters for soft delete.
+            modelBuilder.Entity<Member>().HasQueryFilter(m => !m.IsDeleted);
+            modelBuilder.Entity<Team>().HasQueryFilter(t => !t.IsDeleted);
+            modelBuilder.Entity<Season>().HasQueryFilter(s => !s.IsDeleted);
+            modelBuilder.Entity<Fixture>().HasQueryFilter(f => !f.IsDeleted);
         }
     }
 }

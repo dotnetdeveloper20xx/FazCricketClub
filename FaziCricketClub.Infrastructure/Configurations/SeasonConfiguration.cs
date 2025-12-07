@@ -4,9 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FaziCricketClub.Infrastructure.Configurations
 {
-    /// <summary>
-    /// EF Core configuration for the <see cref="Season"/> entity.
-    /// </summary>
     public class SeasonConfiguration : IEntityTypeConfiguration<Season>
     {
         public void Configure(EntityTypeBuilder<Season> builder)
@@ -25,6 +22,9 @@ namespace FaziCricketClub.Infrastructure.Configurations
 
             builder.Property(s => s.EndDate)
                    .IsRequired();
+
+            builder.Property(s => s.IsDeleted)
+                   .HasDefaultValue(false);
         }
     }
 }

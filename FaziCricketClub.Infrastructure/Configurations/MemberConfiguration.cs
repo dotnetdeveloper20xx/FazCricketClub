@@ -4,10 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FaziCricketClub.Infrastructure.Configurations
 {
-    /// <summary>
-    /// EF Core configuration for the <see cref="Member"/> entity.
-    /// Keeps all Member-specific mapping concerns in one place.
-    /// </summary>
     public class MemberConfiguration : IEntityTypeConfiguration<Member>
     {
         public void Configure(EntityTypeBuilder<Member> builder)
@@ -28,7 +24,8 @@ namespace FaziCricketClub.Infrastructure.Configurations
             builder.Property(m => m.IsActive)
                    .HasDefaultValue(true);
 
-            // Many-to-many with Team will be configured via TeamConfiguration or a join entity later.
+            builder.Property(m => m.IsDeleted)
+                   .HasDefaultValue(false);
         }
     }
 }

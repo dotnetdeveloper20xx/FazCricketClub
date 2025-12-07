@@ -35,9 +35,13 @@ namespace FaziCricketClub.Infrastructure.Repositories
             await _dbContext.Seasons.AddAsync(season, cancellationToken);
         }
 
+        /// <summary>
+        /// Soft deletes the season by setting IsDeleted to true.
+        /// </summary>
         public void Remove(Season season)
         {
-            _dbContext.Seasons.Remove(season);
+            season.IsDeleted = true;
+            // No DbSet.Remove call – we rely on SaveChanges to persist the flag.
         }
     }
 }

@@ -42,8 +42,13 @@
         public string? Notes { get; set; }
 
         /// <summary>
+        /// Indicates that the row has been soft deleted.
+        /// True means logically deleted; it should not appear in normal queries.
+        /// </summary>
+        public bool IsDeleted { get; set; } = false;
+
+        /// <summary>
         /// Teams the member belongs to (many-to-many via a join entity later).
-        /// For now, we keep this simple and can extend it later.
         /// </summary>
         public ICollection<Team> Teams { get; set; } = new List<Team>();
     }
