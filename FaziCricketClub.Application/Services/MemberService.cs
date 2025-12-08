@@ -87,5 +87,64 @@ namespace FaziCricketClub.Application.Services
 
             return true;
         }
+
+        public async Task<PagedResult<MemberDto>> GetPagedAsync(
+       MemberFilterParameters filter,
+       CancellationToken cancellationToken = default)
+        {
+            var members = await _memberRepository.GetAllAsync(cancellationToken);
+            var query = members.AsQueryable();
+
+            // 1. Filtering
+            if (filter.IsActive.HasValue)
+            {
+                query = query.Where(m => m.IsActive == filter.IsActive.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                var search = filter.Search.Trim().ToLowerInvariant();
+                query = query.Where(m =>
+                    (m.FullName ?? string.Empty).ToLower().Contains(search) ||
+                    (m.Email ?? string.Empty).ToLower().Contains(search));
+            }
+
+            // 2. Sorting
+            var sortBy = (filter.SortBy ?? "name").ToLowerInvariant();
+            var sortDirection = (filter.SortDirection ?? "asc").ToLowerInvariant();
+            var descending = sortDirection == "desc";
+
+            query = sortBy switch
+            {
+                "email" => descending
+                    ? query.OrderByDescending(m => m.Email).ThenByDescending(m => m.FullName)
+                    : query.OrderBy(m => m.Email).ThenBy(m => m.FullName),
+
+                _ => descending
+                    ? query.OrderByDescending(m => m.FullName)
+                    : query.OrderBy(m => m.FullName),
+            };
+
+            // 3. Paging
+            var page = filter.Page <= 0 ? 1 : filter.Page;
+            var pageSize = filter.PageSize <= 0 ? 20 : filter.PageSize;
+
+            var totalCount = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var dtoItems = _mapper.Map<List<MemberDto>>(items);
+
+            return new PagedResult<MemberDto>
+            {
+                Items = dtoItems,
+                TotalCount = totalCount,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+        }
     }
 }

@@ -337,5 +337,65 @@ namespace FaziCricketClub.Tests.Unit
             _memberRepositoryMock.VerifyNoOtherCalls();
             _unitOfWorkMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task GetPagedAsync_ShouldFilterSearchSortAndPageMembers()
+        {
+            // ARRANGE
+            var members = new List<Member>
+    {
+        new Member
+        {
+            Id = 1,
+            FullName = "Adam Batter",
+            Email = "adam@example.com",
+            IsActive = true
+        },
+        new Member
+        {
+            Id = 2,
+            FullName = "Zara Bowler",
+            Email = "zara@example.com",
+            IsActive = false
+        },
+        new Member
+        {
+            Id = 3,
+            FullName = "Emily Keeper",
+            Email = "emily@example.com",
+            IsActive = true
+        }
+    };
+
+            _memberRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(members);
+
+            var filter = new MemberFilterParameters
+            {
+                IsActive = true,
+                Search = "a",          // matches Adam + Emily (both contain 'a')
+                SortBy = "name",
+                SortDirection = "asc",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // ACT
+            var result = await _sut.GetPagedAsync(filter);
+
+            // ASSERT
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+
+            // Sorted by FullName ascending: Adam, then Emily
+            result.Items[0].FullName.Should().Be("Adam Batter");
+            result.Items[1].FullName.Should().Be("Emily Keeper");
+
+            _memberRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _memberRepositoryMock.VerifyNoOtherCalls();
+            _unitOfWorkMock.VerifyNoOtherCalls();
+        }
+
     }
 }

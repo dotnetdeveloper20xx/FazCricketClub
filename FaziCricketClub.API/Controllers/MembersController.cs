@@ -1,5 +1,6 @@
 ﻿using FaziCricketClub.API.Models;
 using FaziCricketClub.Application.Dtos;
+using FaziCricketClub.Application.Interfaces;
 using FaziCricketClub.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,34 @@ namespace FaziCricketClub.API.Controllers
         public MembersController(IMemberService memberService)
         {
             _memberService = memberService;
+        }
+
+        /// <summary>
+        /// Returns a paged, filterable, sortable list of members.
+        /// </summary>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<PagedResult<MemberDto>>>> GetPagedAsync(
+            [FromQuery] MemberFilterParameters filter,
+            CancellationToken cancellationToken)
+        {
+            if (filter.Page <= 0)
+            {
+                filter.Page = 1;
+            }
+
+            if (filter.PageSize <= 0)
+            {
+                filter.PageSize = 20;
+            }
+
+            var pagedResult = await _memberService.GetPagedAsync(filter, cancellationToken);
+
+            var response = ApiResponse<PagedResult<MemberDto>>.Ok(
+                pagedResult,
+                "Members retrieved successfully.");
+
+            return Ok(response);
         }
 
         /// <summary>

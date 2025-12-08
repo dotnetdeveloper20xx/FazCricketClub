@@ -1,6 +1,6 @@
 ﻿using FaziCricketClub.Application.Dtos;
 
-namespace FaziCricketClub.Application.Services
+namespace FaziCricketClub.Application.Interfaces
 {
     /// <summary>
     /// Application-level service for working with members.
@@ -16,5 +16,9 @@ namespace FaziCricketClub.Application.Services
         Task<bool> UpdateAsync(int id, UpdateMemberDto request, CancellationToken cancellationToken = default);
 
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+        Task<PagedResult<MemberDto>> GetPagedAsync(
+            MemberFilterParameters filter,
+            CancellationToken cancellationToken = default);
     }
 }
