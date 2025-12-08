@@ -229,5 +229,99 @@ namespace FaziCricketClub.Tests.Unit
             _fixtureRepositoryMock.VerifyNoOtherCalls();
             _seasonRepositoryMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task GetFixtureActivityOverTimeAsync_ShouldGroupFixturesByYearAndMonthAndApplyFilters()
+        {
+            // ARRANGE
+            // Fix dates so test is deterministic.
+            var jan2025 = new DateTime(2025, 1, 15);
+            var feb2025 = new DateTime(2025, 2, 10);
+            var mar2025 = new DateTime(2025, 3, 5);
+
+            var fixtures = new List<Fixture>
+    {
+        // January: 2 fixtures (1 scheduled, 1 completed)
+        new Fixture
+        {
+            Id = 1,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 20,
+            StartDateTime = jan2025,
+            Status = "Scheduled"
+        },
+        new Fixture
+        {
+            Id = 2,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 30,
+            StartDateTime = jan2025.AddDays(5),
+            Status = "Completed"
+        },
+
+        // February: 1 "other" fixture
+        new Fixture
+        {
+            Id = 3,
+            SeasonId = 2,
+            HomeTeamId = 40,
+            AwayTeamId = 10,
+            StartDateTime = feb2025,
+            Status = "Other"
+        },
+
+        // March: 1 scheduled fixture for another team
+        new Fixture
+        {
+            Id = 4,
+            SeasonId = 1,
+            HomeTeamId = 50,
+            AwayTeamId = 60,
+            StartDateTime = mar2025,
+            Status = "Scheduled"
+        }
+    };
+
+            _fixtureRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(fixtures);
+
+            // We only need fixture repo for this test; others should remain unused.
+            _memberRepositoryMock.VerifyNoOtherCalls();
+            _seasonRepositoryMock.VerifyNoOtherCalls();
+            _teamRepositoryMock.VerifyNoOtherCalls();
+
+            var from = new DateTime(2025, 1, 1);
+            var to = new DateTime(2025, 3, 31);
+            int? seasonId = 1;
+            int? teamId = 10;
+
+            // ACT
+            var result = await _sut.GetFixtureActivityOverTimeAsync(from, to, seasonId, teamId);
+
+            // ASSERT
+            // With filters SeasonId = 1 and TeamId = 10:
+            // - Jan fixtures: Id 1 (Scheduled), Id 2 (Completed) – both match.
+            // - Feb fixture: Id 3 => SeasonId 2, but TeamId 10 (away). Should be excluded by SeasonId filter.
+            // - Mar fixture: Id 4 => SeasonId 1, but neither home nor away team is 10. Excluded by TeamId filter.
+            //
+            // So we expect a single group (2025-01) with 2 fixtures.
+
+            result.Should().HaveCount(1);
+
+            var janPoint = result.Single();
+            janPoint.Year.Should().Be(2025);
+            janPoint.Month.Should().Be(1);
+            janPoint.TotalFixtures.Should().Be(2);
+            janPoint.ScheduledFixtures.Should().Be(1);
+            janPoint.CompletedFixtures.Should().Be(1);
+            janPoint.OtherFixtures.Should().Be(0);
+
+            _fixtureRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+        }
+
     }
 }

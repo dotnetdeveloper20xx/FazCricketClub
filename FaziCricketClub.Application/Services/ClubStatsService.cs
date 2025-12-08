@@ -25,6 +25,76 @@ namespace FaziCricketClub.Application.Services
             _teamRepository = teamRepository;
         }
 
+        public async Task<List<FixtureActivityPointDto>> GetFixtureActivityOverTimeAsync(
+     DateTime? from,
+     DateTime? to,
+     int? seasonId = null,
+     int? teamId = null,
+     CancellationToken cancellationToken = default)
+        {
+            // Default range: last 12 months if not provided
+            var now = DateTime.UtcNow;
+            var effectiveTo = to ?? now;
+            var effectiveFrom = from ?? effectiveTo.AddMonths(-11); // 12 months window
+
+            if (effectiveFrom > effectiveTo)
+            {
+                // Swap if user accidentally reversed them
+                (effectiveFrom, effectiveTo) = (effectiveTo, effectiveFrom);
+            }
+
+            var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
+
+            var query = fixtures
+                .Where(f => f.StartDateTime >= effectiveFrom && f.StartDateTime <= effectiveTo)
+                .AsQueryable();
+
+            if (seasonId.HasValue)
+            {
+                query = query.Where(f => f.SeasonId == seasonId.Value);
+            }
+
+            if (teamId.HasValue)
+            {
+                var id = teamId.Value;
+                query = query.Where(f => f.HomeTeamId == id || f.AwayTeamId == id);
+            }
+
+            // Group by Year + Month
+            var groups = query
+                .GroupBy(f => new { f.StartDateTime.Year, f.StartDateTime.Month })
+                .OrderBy(g => g.Key.Year)
+                .ThenBy(g => g.Key.Month)
+                .ToList();
+
+            var results = new List<FixtureActivityPointDto>();
+
+            foreach (var group in groups)
+            {
+                var total = group.Count();
+
+                var scheduled = group.Count(f =>
+                    string.Equals(f.Status, "Scheduled", StringComparison.OrdinalIgnoreCase));
+
+                var completed = group.Count(f =>
+                    string.Equals(f.Status, "Completed", StringComparison.OrdinalIgnoreCase));
+
+                var other = total - scheduled - completed;
+
+                results.Add(new FixtureActivityPointDto
+                {
+                    Year = group.Key.Year,
+                    Month = group.Key.Month,
+                    TotalFixtures = total,
+                    ScheduledFixtures = scheduled,
+                    CompletedFixtures = completed,
+                    OtherFixtures = other
+                });
+            }
+
+            return results;
+        }
+
         public async Task<List<TeamFixtureStatsDto>> GetTeamFixtureStatsAsync(
     CancellationToken cancellationToken = default)
         {

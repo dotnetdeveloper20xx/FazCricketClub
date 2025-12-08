@@ -26,5 +26,16 @@ namespace FaziCricketClub.Application.Interfaces
         /// </summary>
         Task<List<TeamFixtureStatsDto>> GetTeamFixtureStatsAsync(
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns fixture activity aggregated over time (by month),
+        /// optionally filtered by season and/or team and constrained to a date range.
+        /// </summary>
+        Task<List<FixtureActivityPointDto>> GetFixtureActivityOverTimeAsync(
+            DateTime? from,
+            DateTime? to,
+            int? seasonId = null,
+            int? teamId = null,
+            CancellationToken cancellationToken = default);
     }
 }

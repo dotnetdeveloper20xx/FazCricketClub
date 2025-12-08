@@ -66,5 +66,29 @@ namespace FaziCricketClub.API.Controllers
 
             return Ok(response);
         }
+
+        /// <summary>
+        /// Returns fixture activity aggregated over time (by month),
+        /// optionally filtered by season and/or team.
+        /// </summary>
+        [HttpGet("fixture-activity")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<FixtureActivityPointDto>>>> GetFixtureActivityOverTimeAsync(
+            [FromQuery] FixtureActivityFilterParameters filter,
+            CancellationToken cancellationToken)
+        {
+            var points = await _clubStatsService.GetFixtureActivityOverTimeAsync(
+                filter.From,
+                filter.To,
+                filter.SeasonId,
+                filter.TeamId,
+                cancellationToken);
+
+            var response = ApiResponse<IEnumerable<FixtureActivityPointDto>>.Ok(
+                points,
+                "Fixture activity over time retrieved successfully.");
+
+            return Ok(response);
+        }
     }
 }
