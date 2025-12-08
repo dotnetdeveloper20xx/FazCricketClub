@@ -20,6 +20,41 @@ namespace FaziCricketClub.API.Controllers
             _fixtureService = fixtureService;
         }
 
+
+        /// <summary>
+        /// Returns a paged, filterable, sortable list of fixtures.
+        /// </summary>
+        /// <param name="filter">
+        /// Query parameters for paging, filtering and sorting:
+        /// page, pageSize, seasonId, teamId, fromDate, toDate, sortBy, sortDirection.
+        /// </param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<PagedResult<FixtureDto>>>> GetPagedAsync(
+            [FromQuery] FixtureFilterParameters filter,
+            CancellationToken cancellationToken)
+        {
+            // Basic guard for silly values; service also normalises internally.
+            if (filter.Page <= 0)
+            {
+                filter.Page = 1;
+            }
+
+            if (filter.PageSize <= 0)
+            {
+                filter.PageSize = 20;
+            }
+
+            var pagedResult = await _fixtureService.GetPagedAsync(filter, cancellationToken);
+
+            var response = ApiResponse<PagedResult<FixtureDto>>.Ok(
+                pagedResult,
+                "Fixtures retrieved successfully.");
+
+            return Ok(response);
+        }
+
         /// <summary>
         /// Gets all fixtures.
         /// </summary>

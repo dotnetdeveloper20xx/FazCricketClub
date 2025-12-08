@@ -87,5 +87,83 @@ namespace FaziCricketClub.Application.Services
 
             return true;
         }
+
+        public async Task<PagedResult<FixtureDto>> GetPagedAsync(
+       FixtureFilterParameters filter,
+       CancellationToken cancellationToken = default)
+        {
+            // Load all fixtures from the repository.
+            // (Later we could push filtering down to EF; for now it’s in-memory and simple.)
+            var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
+
+            var query = fixtures.AsQueryable();
+
+            // 1. Filtering
+            if (filter.SeasonId.HasValue)
+            {
+                query = query.Where(f => f.SeasonId == filter.SeasonId.Value);
+            }
+
+            if (filter.TeamId.HasValue)
+            {
+                var teamId = filter.TeamId.Value;
+                query = query.Where(f => f.HomeTeamId == teamId || f.AwayTeamId == teamId);
+            }
+
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(f => f.StartDateTime >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                query = query.Where(f => f.StartDateTime <= filter.ToDate.Value);
+            }
+
+            // 2. Sorting
+            var sortBy = (filter.SortBy ?? "date").ToLowerInvariant();
+            var sortDirection = (filter.SortDirection ?? "asc").ToLowerInvariant();
+            var descending = sortDirection == "desc";
+
+            query = sortBy switch
+            {
+                "competition" => descending
+                    ? query.OrderByDescending(f => f.CompetitionName)
+                           .ThenByDescending(f => f.StartDateTime)
+                    : query.OrderBy(f => f.CompetitionName)
+                           .ThenBy(f => f.StartDateTime),
+
+                "status" => descending
+                    ? query.OrderByDescending(f => f.Status)
+                           .ThenByDescending(f => f.StartDateTime)
+                    : query.OrderBy(f => f.Status)
+                           .ThenBy(f => f.StartDateTime),
+
+                _ => descending
+                    ? query.OrderByDescending(f => f.StartDateTime)
+                    : query.OrderBy(f => f.StartDateTime),
+            };
+
+            // 3. Paging (with sane defaults)
+            var page = filter.Page <= 0 ? 1 : filter.Page;
+            var pageSize = filter.PageSize <= 0 ? 20 : filter.PageSize;
+
+            var totalCount = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var dtoItems = _mapper.Map<List<FixtureDto>>(items);
+
+            return new PagedResult<FixtureDto>
+            {
+                Items = dtoItems,
+                TotalCount = totalCount,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+        }
     }
 }

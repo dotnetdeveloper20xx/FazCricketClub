@@ -349,5 +349,83 @@ namespace FaziCricketClub.Tests.Unit
             _fixtureRepositoryMock.VerifyNoOtherCalls();
             _unitOfWorkMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task GetPagedAsync_ShouldFilterSortAndPageFixtures()
+        {
+            // ARRANGE
+            var baseDate = new DateTime(2025, 6, 1, 10, 0, 0);
+
+            var fixtures = new List<Fixture>
+    {
+        new Fixture
+        {
+            Id = 1,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 20,
+            StartDateTime = baseDate.AddDays(1),
+            Venue = "Ground A",
+            CompetitionName = "League",
+            Status = "Scheduled"
+        },
+        new Fixture
+        {
+            Id = 2,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 30,
+            StartDateTime = baseDate.AddDays(2),
+            Venue = "Ground B",
+            CompetitionName = "Cup",
+            Status = "Completed"
+        },
+        new Fixture
+        {
+            Id = 3,
+            SeasonId = 2,
+            HomeTeamId = 40,
+            AwayTeamId = 10,
+            StartDateTime = baseDate.AddDays(3),
+            Venue = "Ground C",
+            CompetitionName = "League",
+            Status = "Scheduled"
+        }
+    };
+
+            _fixtureRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(fixtures);
+
+            var filter = new FixtureFilterParameters
+            {
+                SeasonId = 1,
+                TeamId = 10,
+                Page = 1,
+                PageSize = 10,
+                SortBy = "date",
+                SortDirection = "asc"
+            };
+
+            // ACT
+            var result = await _sut.GetPagedAsync(filter);
+
+            // ASSERT
+            // We expect only fixtures that:
+            // - SeasonId == 1
+            // - and (HomeTeamId == 10 or AwayTeamId == 10)
+            // That matches Id = 1 and Id = 2.
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+
+            // Ordered by StartDateTime ascending: Id 1, then Id 2.
+            result.Items[0].Id.Should().Be(1);
+            result.Items[1].Id.Should().Be(2);
+
+            _fixtureRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+            _unitOfWorkMock.VerifyNoOtherCalls();
+        }
+
     }
 }

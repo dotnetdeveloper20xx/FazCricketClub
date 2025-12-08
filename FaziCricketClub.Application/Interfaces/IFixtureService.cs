@@ -16,5 +16,9 @@ namespace FaziCricketClub.Application.Interfaces
         Task<bool> UpdateAsync(int id, UpdateFixtureDto request, CancellationToken cancellationToken = default);
 
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+        Task<PagedResult<FixtureDto>> GetPagedAsync(
+           FixtureFilterParameters filter,
+           CancellationToken cancellationToken = default);
     }
 }
