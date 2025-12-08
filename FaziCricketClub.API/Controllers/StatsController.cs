@@ -16,6 +16,26 @@ namespace FaziCricketClub.API.Controllers
             _clubStatsService = clubStatsService;
         }
 
+
+        /// <summary>
+        /// Returns fixture aggregation per season, including
+        /// average fixtures per team in that season.
+        /// </summary>
+        [HttpGet("season-fixture-averages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<SeasonFixtureAverageDto>>>> GetSeasonFixtureAveragesAsync(
+            CancellationToken cancellationToken)
+        {
+            var stats = await _clubStatsService.GetSeasonFixtureAveragesAsync(cancellationToken);
+
+            var response = ApiResponse<IEnumerable<SeasonFixtureAverageDto>>.Ok(
+                stats,
+                "Season fixture averages retrieved successfully.");
+
+            return Ok(response);
+        }
+
+
         /// <summary>
         /// Returns club-wide statistics for dashboard use.
         /// </summary>
@@ -90,5 +110,28 @@ namespace FaziCricketClub.API.Controllers
 
             return Ok(response);
         }
+
+        /// <summary>
+        /// Returns member sign-up activity aggregated over time (by month).
+        /// </summary>
+        [HttpGet("member-activity")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<MemberActivityPointDto>>>> GetMemberActivityOverTimeAsync(
+            [FromQuery] MemberActivityFilterParameters filter,
+            CancellationToken cancellationToken)
+        {
+            var points = await _clubStatsService.GetMemberActivityOverTimeAsync(
+                filter.From,
+                filter.To,
+                filter.IsActive,
+                cancellationToken);
+
+            var response = ApiResponse<IEnumerable<MemberActivityPointDto>>.Ok(
+                points,
+                "Member activity over time retrieved successfully.");
+
+            return Ok(response);
+        }
+
     }
 }

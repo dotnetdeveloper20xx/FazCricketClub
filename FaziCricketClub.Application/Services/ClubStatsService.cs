@@ -25,6 +25,116 @@ namespace FaziCricketClub.Application.Services
             _teamRepository = teamRepository;
         }
 
+        public async Task<List<SeasonFixtureAverageDto>> GetSeasonFixtureAveragesAsync(
+       CancellationToken cancellationToken = default)
+        {
+            var seasons = await _seasonRepository.GetAllAsync(cancellationToken);
+            var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
+
+            // Group fixtures by season
+            var groups = fixtures
+                .GroupBy(f => f.SeasonId)
+                .ToList();
+
+            var results = new List<SeasonFixtureAverageDto>();
+
+            foreach (var group in groups)
+            {
+                var seasonId = group.Key;
+                var season = seasons.FirstOrDefault(s => s.Id == seasonId);
+
+                var totalFixtures = group.Count();
+
+                // Distinct teams that appeared in at least one fixture this season
+                var distinctTeamIds = group
+                    .SelectMany(f => new[] { f.HomeTeamId, f.AwayTeamId })
+                    .Where(id => id != 0) // assuming 0 means “unassigned”; adjust if needed
+                    .Distinct()
+                    .ToList();
+
+                var teamsWithFixtures = distinctTeamIds.Count;
+
+                double average = 0;
+                if (teamsWithFixtures > 0)
+                {
+                    average = totalFixtures / (double)teamsWithFixtures;
+                }
+
+                results.Add(new SeasonFixtureAverageDto
+                {
+                    SeasonId = seasonId,
+                    SeasonName = season?.Name ?? $"Season {seasonId}",
+                    TotalFixtures = totalFixtures,
+                    TeamsWithFixtures = teamsWithFixtures,
+                    AverageFixturesPerTeam = average
+                });
+            }
+
+            // Optional: order by season name or some other criteria
+            results = results
+                .OrderBy(r => r.SeasonName)
+                .ToList();
+
+            return results;
+        }
+
+        public async Task<List<MemberActivityPointDto>> GetMemberActivityOverTimeAsync(
+    DateTime? from,
+    DateTime? to,
+    bool? isActive = null,
+    CancellationToken cancellationToken = default)
+        {
+            // Default: last 12 months, based on 'to' or now
+            var now = DateTime.UtcNow;
+            var effectiveTo = to ?? now;
+            var effectiveFrom = from ?? effectiveTo.AddMonths(-11);
+
+            if (effectiveFrom > effectiveTo)
+            {
+                (effectiveFrom, effectiveTo) = (effectiveTo, effectiveFrom);
+            }
+
+            var members = await _memberRepository.GetAllAsync(cancellationToken);
+
+            // Assuming Member has a JoinedOn (or similar) property.
+            // Replace JoinedOn with the correct property if different.
+            var query = members
+                .Where(m => m.JoinedOn >= effectiveFrom && m.JoinedOn <= effectiveTo)
+                .AsQueryable();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(m => m.IsActive == isActive.Value);
+            }
+
+            var groups = query
+                .GroupBy(m => new { m.JoinedOn.Year, m.JoinedOn.Month })
+                .OrderBy(g => g.Key.Year)
+                .ThenBy(g => g.Key.Month)
+                .ToList();
+
+            var results = new List<MemberActivityPointDto>();
+
+            foreach (var group in groups)
+            {
+                var total = group.Count();
+                var active = group.Count(m => m.IsActive);
+                var inactive = total - active;
+
+                results.Add(new MemberActivityPointDto
+                {
+                    Year = group.Key.Year,
+                    Month = group.Key.Month,
+                    JoinedCount = total,
+                    ActiveJoinedCount = active,
+                    InactiveJoinedCount = inactive
+                });
+            }
+
+            return results;
+        }
+
+
         public async Task<List<FixtureActivityPointDto>> GetFixtureActivityOverTimeAsync(
      DateTime? from,
      DateTime? to,

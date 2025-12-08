@@ -37,5 +37,22 @@ namespace FaziCricketClub.Application.Interfaces
             int? seasonId = null,
             int? teamId = null,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns member sign-up activity aggregated over time (by month),
+        /// optionally constrained to a date range and filtered by active status.
+        /// </summary>
+        Task<List<MemberActivityPointDto>> GetMemberActivityOverTimeAsync(
+            DateTime? from,
+            DateTime? to,
+            bool? isActive = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns fixture aggregation per season, including
+        /// average fixtures per team in that season.
+        /// </summary>
+        Task<List<SeasonFixtureAverageDto>> GetSeasonFixtureAveragesAsync(
+            CancellationToken cancellationToken = default);
     }
 }

@@ -323,5 +323,193 @@ namespace FaziCricketClub.Tests.Unit
             _fixtureRepositoryMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task GetMemberActivityOverTimeAsync_ShouldGroupJoinsByYearAndMonthAndApplyActiveFilter()
+        {
+            // ARRANGE
+            var jan2025 = new DateTime(2025, 1, 10);
+            var feb2025 = new DateTime(2025, 2, 5);
+            var mar2025 = new DateTime(2025, 3, 20);
+
+            var members = new List<Member>
+    {
+        // January: 2 members (1 active, 1 inactive)
+        new Member
+        {
+            Id = 1,
+            FullName = "Alice",
+            IsActive = true,
+            JoinedOn = jan2025
+        },
+        new Member
+        {
+            Id = 2,
+            FullName = "Bob",
+            IsActive = false,
+            JoinedOn = jan2025.AddDays(3)
+        },
+
+        // February: 1 active member
+        new Member
+        {
+            Id = 3,
+            FullName = "Charlie",
+            IsActive = true,
+            JoinedOn = feb2025
+        },
+
+        // March: 1 inactive member
+        new Member
+        {
+            Id = 4,
+            FullName = "Dana",
+            IsActive = false,
+            JoinedOn = mar2025
+        }
+    };
+
+            _memberRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(members);
+
+            // Other repos unused here
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+            _seasonRepositoryMock.VerifyNoOtherCalls();
+            _teamRepositoryMock.VerifyNoOtherCalls();
+
+            var from = new DateTime(2025, 1, 1);
+            var to = new DateTime(2025, 3, 31);
+            bool? isActive = null; // all members
+
+            // ACT
+            var result = await _sut.GetMemberActivityOverTimeAsync(from, to, isActive);
+
+            // ASSERT
+            result.Should().HaveCount(3);
+
+            var janPoint = result.Single(p => p.Year == 2025 && p.Month == 1);
+            janPoint.JoinedCount.Should().Be(2);
+            janPoint.ActiveJoinedCount.Should().Be(1);
+            janPoint.InactiveJoinedCount.Should().Be(1);
+
+            var febPoint = result.Single(p => p.Year == 2025 && p.Month == 2);
+            febPoint.JoinedCount.Should().Be(1);
+            febPoint.ActiveJoinedCount.Should().Be(1);
+            febPoint.InactiveJoinedCount.Should().Be(0);
+
+            var marPoint = result.Single(p => p.Year == 2025 && p.Month == 3);
+            marPoint.JoinedCount.Should().Be(1);
+            marPoint.ActiveJoinedCount.Should().Be(0);
+            marPoint.InactiveJoinedCount.Should().Be(1);
+
+            _memberRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _memberRepositoryMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetSeasonFixtureAveragesAsync_ShouldCalculateAverageFixturesPerTeamPerSeason()
+        {
+            // ARRANGE
+            var seasons = new List<Season>
+    {
+        new Season { Id = 1, Name = "2025 Summer" },
+        new Season { Id = 2, Name = "2025 Winter" }
+    };
+
+            // Season 1:
+            // - Fixtures:
+            //   - Id 1: Team 10 vs 20
+            //   - Id 2: Team 10 vs 30
+            //   - Id 3: Team 40 vs 20
+            //
+            // Distinct teams: 10,20,30,40 => 4 teams
+            // Total fixtures: 3
+            // Average = 3 / 4 = 0.75
+            //
+            // Season 2:
+            // - Fixtures:
+            //   - Id 4: Team 50 vs 60
+            //   - Id 5: Team 50 vs 60
+            //
+            // Distinct teams: 50,60 => 2 teams
+            // Total fixtures: 2
+            // Average = 2 / 2 = 1.0
+
+            var fixtures = new List<Fixture>
+    {
+        new Fixture
+        {
+            Id = 1,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 20
+        },
+        new Fixture
+        {
+            Id = 2,
+            SeasonId = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 30
+        },
+        new Fixture
+        {
+            Id = 3,
+            SeasonId = 1,
+            HomeTeamId = 40,
+            AwayTeamId = 20
+        },
+        new Fixture
+        {
+            Id = 4,
+            SeasonId = 2,
+            HomeTeamId = 50,
+            AwayTeamId = 60
+        },
+        new Fixture
+        {
+            Id = 5,
+            SeasonId = 2,
+            HomeTeamId = 50,
+            AwayTeamId = 60
+        }
+    };
+
+            _seasonRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(seasons);
+
+            _fixtureRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(fixtures);
+
+            // ACT
+            var result = await _sut.GetSeasonFixtureAveragesAsync();
+
+            // ASSERT
+            result.Should().HaveCount(2);
+
+            var season1 = result.Single(r => r.SeasonId == 1);
+            season1.SeasonName.Should().Be("2025 Summer");
+            season1.TotalFixtures.Should().Be(3);
+            season1.TeamsWithFixtures.Should().Be(4);
+            season1.AverageFixturesPerTeam.Should().BeApproximately(0.75, 0.0001);
+
+            var season2 = result.Single(r => r.SeasonId == 2);
+            season2.SeasonName.Should().Be("2025 Winter");
+            season2.TotalFixtures.Should().Be(2);
+            season2.TeamsWithFixtures.Should().Be(2);
+            season2.AverageFixturesPerTeam.Should().BeApproximately(1.0, 0.0001);
+
+            _seasonRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _fixtureRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+            _memberRepositoryMock.VerifyNoOtherCalls();
+            _teamRepositoryMock.VerifyNoOtherCalls();
+            _seasonRepositoryMock.VerifyNoOtherCalls();
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+        }
+
+
+
     }
 }
