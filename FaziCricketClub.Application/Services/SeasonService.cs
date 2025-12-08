@@ -92,3 +92,4 @@ namespace FaziCricketClub.Application.Services
         }
     }
 }
+

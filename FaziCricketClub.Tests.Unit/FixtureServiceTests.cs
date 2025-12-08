@@ -1,5 +1,7 @@
-﻿using FaziCricketClub.Application.Dtos;
+﻿using AutoMapper;
+using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using FaziCricketClub.Application.Mapping;
 using FaziCricketClub.Application.Services;
 using FaziCricketClub.Domain.Entities;
 using FluentAssertions;
@@ -7,15 +9,11 @@ using Moq;
 
 namespace FaziCricketClub.Tests.Unit
 {
-    /// <summary>
-    /// Unit tests for <see cref="FixtureService"/>.
-    /// Verifies that the service orchestrates the repository and unit of work,
-    /// and correctly maps entities to DTOs.
-    /// </summary>
     public class FixtureServiceTests
     {
         private readonly Mock<IFixtureRepository> _fixtureRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly IMapper _mapper;
         private readonly FixtureService _sut; // System Under Test
 
         public FixtureServiceTests()
@@ -23,7 +21,17 @@ namespace FaziCricketClub.Tests.Unit
             _fixtureRepositoryMock = new Mock<IFixtureRepository>(MockBehavior.Strict);
             _unitOfWorkMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
 
-            _sut = new FixtureService(_fixtureRepositoryMock.Object, _unitOfWorkMock.Object);
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CricketClubMappingProfile>();
+            }, null);
+
+            _mapper = config.CreateMapper();
+
+            _sut = new FixtureService(
+                _fixtureRepositoryMock.Object,
+                _unitOfWorkMock.Object,
+                _mapper);
         }
 
         [Fact]

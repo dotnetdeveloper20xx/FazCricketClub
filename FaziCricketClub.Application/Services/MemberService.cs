@@ -1,4 +1,5 @@
-﻿using FaziCricketClub.Application.Dtos;
+﻿using AutoMapper;
+using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
 using FaziCricketClub.Domain.Entities;
 
@@ -6,36 +7,32 @@ namespace FaziCricketClub.Application.Services
 {
     /// <summary>
     /// Default implementation of <see cref="IMemberService"/>.
-    /// Coordinates repositories and unit of work.
+    /// Coordinates repositories, unit of work, and mappings.
     /// </summary>
     public class MemberService : IMemberService
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public MemberService(IMemberRepository memberRepository, IUnitOfWork unitOfWork)
+        public MemberService(
+            IMemberRepository memberRepository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _memberRepository = memberRepository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<List<MemberDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var members = await _memberRepository.GetAllAsync(cancellationToken);
 
-            return members
-                .OrderBy(m => m.FullName)
-                .Select(m => new MemberDto
-                {
-                    Id = m.Id,
-                    FullName = m.FullName,
-                    Email = m.Email,
-                    PhoneNumber = m.PhoneNumber,
-                    DateOfBirth = m.DateOfBirth,
-                    IsActive = m.IsActive,
-                    Notes = m.Notes
-                })
-                .ToList();
+            // Order first, then map.
+            var ordered = members.OrderBy(m => m.FullName).ToList();
+
+            return _mapper.Map<List<MemberDto>>(ordered);
         }
 
         public async Task<MemberDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -47,43 +44,17 @@ namespace FaziCricketClub.Application.Services
                 return null;
             }
 
-            return new MemberDto
-            {
-                Id = member.Id,
-                FullName = member.FullName,
-                Email = member.Email,
-                PhoneNumber = member.PhoneNumber,
-                DateOfBirth = member.DateOfBirth,
-                IsActive = member.IsActive,
-                Notes = member.Notes
-            };
+            return _mapper.Map<MemberDto>(member);
         }
 
         public async Task<MemberDto> CreateAsync(CreateMemberDto request, CancellationToken cancellationToken = default)
         {
-            var member = new Member
-            {
-                FullName = request.FullName,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                DateOfBirth = request.DateOfBirth,
-                IsActive = request.IsActive,
-                Notes = request.Notes
-            };
+            var member = _mapper.Map<Member>(request);
 
             await _memberRepository.AddAsync(member, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new MemberDto
-            {
-                Id = member.Id,
-                FullName = member.FullName,
-                Email = member.Email,
-                PhoneNumber = member.PhoneNumber,
-                DateOfBirth = member.DateOfBirth,
-                IsActive = member.IsActive,
-                Notes = member.Notes
-            };
+            return _mapper.Map<MemberDto>(member);
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateMemberDto request, CancellationToken cancellationToken = default)
@@ -95,12 +66,8 @@ namespace FaziCricketClub.Application.Services
                 return false;
             }
 
-            member.FullName = request.FullName;
-            member.Email = request.Email;
-            member.PhoneNumber = request.PhoneNumber;
-            member.DateOfBirth = request.DateOfBirth;
-            member.IsActive = request.IsActive;
-            member.Notes = request.Notes;
+            // Map request → existing entity
+            _mapper.Map(request, member);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
