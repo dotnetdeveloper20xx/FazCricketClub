@@ -14,5 +14,11 @@ namespace FaziCricketClub.Application.Interfaces
         /// Calculates club-wide statistics for members and fixtures.
         /// </summary>
         Task<ClubStatsDto> GetClubStatsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns aggregated fixture statistics grouped by season.
+        /// </summary>
+        Task<List<SeasonFixtureStatsDto>> GetSeasonFixtureStatsAsync(
+            CancellationToken cancellationToken = default);
     }
 }

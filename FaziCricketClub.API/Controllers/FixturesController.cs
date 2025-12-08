@@ -22,6 +22,34 @@ namespace FaziCricketClub.API.Controllers
 
 
         /// <summary>
+        /// Returns upcoming fixtures for the next number of days,
+        /// optionally filtered by team.
+        /// </summary>
+        /// <param name="days">Number of days ahead to look (default 7).</param>
+        /// <param name="teamId">Optional team id to filter by.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        [HttpGet("upcoming")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<FixtureDto>>>> GetUpcomingAsync(
+            [FromQuery] int days = 7,
+            [FromQuery] int? teamId = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (days <= 0)
+            {
+                days = 7;
+            }
+
+            var fixtures = await _fixtureService.GetUpcomingAsync(days, teamId, cancellationToken);
+
+            var response = ApiResponse<IEnumerable<FixtureDto>>.Ok(
+                fixtures,
+                $"Upcoming fixtures for the next {days} day(s).");
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Returns a paged, filterable, sortable list of fixtures.
         /// </summary>
         /// <param name="filter">

@@ -427,5 +427,75 @@ namespace FaziCricketClub.Tests.Unit
             _unitOfWorkMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task GetUpcomingAsync_ShouldReturnUpcomingScheduledFixturesFilteredByTeam()
+        {
+            // ARRANGE
+            var now = DateTime.UtcNow;
+
+            var fixtures = new List<Fixture>
+    {
+        // Past fixture – should be excluded
+        new Fixture
+        {
+            Id = 1,
+            HomeTeamId = 10,
+            AwayTeamId = 20,
+            StartDateTime = now.AddDays(-1),
+            Status = "Scheduled"
+        },
+        // Within range, correct team
+        new Fixture
+        {
+            Id = 2,
+            HomeTeamId = 10,
+            AwayTeamId = 30,
+            StartDateTime = now.AddDays(2),
+            Status = "Scheduled"
+        },
+        // Within range, wrong team
+        new Fixture
+        {
+            Id = 3,
+            HomeTeamId = 40,
+            AwayTeamId = 50,
+            StartDateTime = now.AddDays(3),
+            Status = "Scheduled"
+        },
+        // Within range, correct team but not scheduled
+        new Fixture
+        {
+            Id = 4,
+            HomeTeamId = 10,
+            AwayTeamId = 60,
+            StartDateTime = now.AddDays(4),
+            Status = "Completed"
+        }
+    };
+
+            _fixtureRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(fixtures);
+
+            var daysAhead = 7;
+            var teamId = 10;
+
+            // ACT
+            var result = await _sut.GetUpcomingAsync(daysAhead, teamId);
+
+            // ASSERT
+            // Only Id = 2 should match:
+            // - within next 7 days
+            // - team 10 either home or away
+            // - status scheduled
+            result.Should().HaveCount(1);
+            result[0].Id.Should().Be(2);
+
+            _fixtureRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+            _unitOfWorkMock.VerifyNoOtherCalls();
+        }
+
+
     }
 }

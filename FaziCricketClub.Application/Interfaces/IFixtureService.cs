@@ -20,5 +20,14 @@ namespace FaziCricketClub.Application.Interfaces
         Task<PagedResult<FixtureDto>> GetPagedAsync(
            FixtureFilterParameters filter,
            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns upcoming fixtures for the next number of days,
+        /// optionally filtered by team.
+        /// </summary>
+        Task<List<FixtureDto>> GetUpcomingAsync(
+            int daysAhead,
+            int? teamId = null,
+            CancellationToken cancellationToken = default);
     }
 }

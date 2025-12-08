@@ -25,6 +25,47 @@ namespace FaziCricketClub.Application.Services
             _mapper = mapper;
         }
 
+        public async Task<List<FixtureDto>> GetUpcomingAsync(
+    int daysAhead,
+    int? teamId = null,
+    CancellationToken cancellationToken = default)
+        {
+            if (daysAhead <= 0)
+            {
+                daysAhead = 7; // sensible default
+            }
+
+            var now = DateTime.UtcNow;
+            var upper = now.AddDays(daysAhead);
+
+            var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
+            var query = fixtures.AsQueryable();
+
+            // Only future fixtures in the time window
+            query = query.Where(f => f.StartDateTime >= now && f.StartDateTime <= upper);
+
+            // Optional team filter
+            if (teamId.HasValue)
+            {
+                var id = teamId.Value;
+                query = query.Where(f => f.HomeTeamId == id || f.AwayTeamId == id);
+            }
+
+            // Optional: only "Scheduled"/similar statuses
+            query = query.Where(f =>
+                string.Equals(f.Status, "Scheduled", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(f.Status, "Planned", StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(f.Status));
+
+            // Order by date
+            var ordered = query
+                .OrderBy(f => f.StartDateTime)
+                .ToList();
+
+            return _mapper.Map<List<FixtureDto>>(ordered);
+        }
+
+
         public async Task<List<FixtureDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
