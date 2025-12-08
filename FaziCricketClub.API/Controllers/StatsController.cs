@@ -49,5 +49,22 @@ namespace FaziCricketClub.API.Controllers
 
             return Ok(response);
         }
+
+        /// <summary>
+        /// Returns fixture statistics grouped by team.
+        /// </summary>
+        [HttpGet("fixtures-by-team")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<TeamFixtureStatsDto>>>> GetFixtureStatsByTeamAsync(
+            CancellationToken cancellationToken)
+        {
+            var stats = await _clubStatsService.GetTeamFixtureStatsAsync(cancellationToken);
+
+            var response = ApiResponse<IEnumerable<TeamFixtureStatsDto>>.Ok(
+                stats,
+                "Fixture stats by team retrieved successfully.");
+
+            return Ok(response);
+        }
     }
 }

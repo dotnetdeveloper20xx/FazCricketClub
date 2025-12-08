@@ -11,15 +11,70 @@ namespace FaziCricketClub.Application.Services
         private readonly IMemberRepository _memberRepository;
         private readonly IFixtureRepository _fixtureRepository;
         private readonly ISeasonRepository _seasonRepository;
+        private readonly ITeamRepository _teamRepository;
 
         public ClubStatsService(
             IMemberRepository memberRepository,
             IFixtureRepository fixtureRepository,
-            ISeasonRepository seasonRepository)
+            ISeasonRepository seasonRepository,
+            ITeamRepository teamRepository)
         {
             _memberRepository = memberRepository;
             _fixtureRepository = fixtureRepository;
             _seasonRepository = seasonRepository;
+            _teamRepository = teamRepository;
+        }
+
+        public async Task<List<TeamFixtureStatsDto>> GetTeamFixtureStatsAsync(
+    CancellationToken cancellationToken = default)
+        {
+            var teams = await _teamRepository.GetAllAsync(cancellationToken);
+            var fixtures = await _fixtureRepository.GetAllAsync(cancellationToken);
+
+            var now = DateTime.UtcNow;
+
+            var results = new List<TeamFixtureStatsDto>();
+
+            foreach (var team in teams)
+            {
+                var teamId = team.Id;
+
+                var teamFixtures = fixtures
+                    .Where(f => f.HomeTeamId == teamId || f.AwayTeamId == teamId)
+                    .ToList();
+
+                var total = teamFixtures.Count;
+
+                var home = teamFixtures.Count(f => f.HomeTeamId == teamId);
+                var away = teamFixtures.Count(f => f.AwayTeamId == teamId);
+
+                var completed = teamFixtures.Count(f =>
+                    string.Equals(f.Status, "Completed", StringComparison.OrdinalIgnoreCase));
+
+                var upcoming = teamFixtures.Count(f =>
+                    f.StartDateTime >= now &&
+                    (string.Equals(f.Status, "Scheduled", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(f.Status, "Planned", StringComparison.OrdinalIgnoreCase) ||
+                     string.IsNullOrWhiteSpace(f.Status)));
+
+                results.Add(new TeamFixtureStatsDto
+                {
+                    TeamId = teamId,
+                    TeamName = team.Name,
+                    TotalFixtures = total,
+                    HomeFixtures = home,
+                    AwayFixtures = away,
+                    CompletedFixtures = completed,
+                    UpcomingFixtures = upcoming
+                });
+            }
+
+            // Optional: order by team name
+            results = results
+                .OrderBy(r => r.TeamName)
+                .ToList();
+
+            return results;
         }
 
         public async Task<ClubStatsDto> GetClubStatsAsync(CancellationToken cancellationToken = default)

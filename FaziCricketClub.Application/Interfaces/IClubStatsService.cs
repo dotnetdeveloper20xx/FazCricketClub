@@ -20,5 +20,11 @@ namespace FaziCricketClub.Application.Interfaces
         /// </summary>
         Task<List<SeasonFixtureStatsDto>> GetSeasonFixtureStatsAsync(
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns aggregated fixture statistics grouped by team.
+        /// </summary>
+        Task<List<TeamFixtureStatsDto>> GetTeamFixtureStatsAsync(
+            CancellationToken cancellationToken = default);
     }
 }

@@ -14,6 +14,7 @@ namespace FaziCricketClub.Tests.Unit
         private readonly Mock<IMemberRepository> _memberRepositoryMock;
         private readonly Mock<IFixtureRepository> _fixtureRepositoryMock;
         private readonly Mock<ISeasonRepository> _seasonRepositoryMock;
+        private readonly Mock<ITeamRepository> _teamRepositoryMock;
         private readonly ClubStatsService _sut;
 
         public ClubStatsServiceTests()
@@ -21,12 +22,106 @@ namespace FaziCricketClub.Tests.Unit
             _memberRepositoryMock = new Mock<IMemberRepository>(MockBehavior.Strict);
             _fixtureRepositoryMock = new Mock<IFixtureRepository>(MockBehavior.Strict);
             _seasonRepositoryMock = new Mock<ISeasonRepository>(MockBehavior.Strict);
+            _teamRepositoryMock = new Mock<ITeamRepository>(MockBehavior.Strict);
 
             _sut = new ClubStatsService(
                 _memberRepositoryMock.Object,
                 _fixtureRepositoryMock.Object,
-                _seasonRepositoryMock.Object);
+                _seasonRepositoryMock.Object,
+                _teamRepositoryMock.Object);
         }
+
+        [Fact]
+        public async Task GetTeamFixtureStatsAsync_ShouldAggregateFixturesPerTeam()
+        {
+            // ARRANGE
+            var now = DateTime.UtcNow;
+
+            var teams = new List<Team>
+            {
+                new Team { Id = 10, Name = "First XI" },
+                new Team { Id = 20, Name = "Second XI" }
+            };
+
+            var fixtures = new List<Fixture>
+            {
+                // Team 10 home vs Team 20, completed
+                new Fixture
+                {
+                    Id = 1,
+                    HomeTeamId = 10,
+                    AwayTeamId = 20,
+                    StartDateTime = now.AddDays(-1),
+                    Status = "Completed"
+                },
+                // Team 10 away vs someone else, upcoming scheduled
+                new Fixture
+                {
+                    Id = 2,
+                    HomeTeamId = 30,
+                    AwayTeamId = 10,
+                    StartDateTime = now.AddDays(2),
+                    Status = "Scheduled"
+                },
+                // Team 20 home vs someone else, upcoming planned
+                new Fixture
+                {
+                    Id = 3,
+                    HomeTeamId = 20,
+                    AwayTeamId = 40,
+                    StartDateTime = now.AddDays(3),
+                    Status = "Planned"
+                },
+                // Team 20 away vs someone else, other status
+                new Fixture
+                {
+                    Id = 4,
+                    HomeTeamId = 50,
+                    AwayTeamId = 20,
+                    StartDateTime = now.AddDays(4),
+                    Status = "Other"
+                }
+            };
+
+            _teamRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(teams);
+
+            _fixtureRepositoryMock
+                .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(fixtures);
+
+            // ACT
+            var result = await _sut.GetTeamFixtureStatsAsync();
+
+            // ASSERT
+            result.Should().HaveCount(2);
+
+            var team10 = result.Single(r => r.TeamId == 10);
+            team10.TeamName.Should().Be("First XI");
+            team10.TotalFixtures.Should().Be(2);      // Id 1,2
+            team10.HomeFixtures.Should().Be(1);       // Id 1
+            team10.AwayFixtures.Should().Be(1);       // Id 2
+            team10.CompletedFixtures.Should().Be(1);  // Id 1
+            team10.UpcomingFixtures.Should().Be(1);   // Id 2 (future + scheduled)
+
+            var team20 = result.Single(r => r.TeamId == 20);
+            team20.TeamName.Should().Be("Second XI");
+            team20.TotalFixtures.Should().Be(3);      // Id 1,3,4
+            team20.HomeFixtures.Should().Be(1);       // Id 3
+            team20.AwayFixtures.Should().Be(2);       // Id 1,4
+            team20.CompletedFixtures.Should().Be(1);  // Id 1
+            team20.UpcomingFixtures.Should().Be(1);   // Id 3 (future + planned)
+
+            _teamRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _fixtureRepositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+            _memberRepositoryMock.VerifyNoOtherCalls();
+            _seasonRepositoryMock.VerifyNoOtherCalls();
+            _teamRepositoryMock.VerifyNoOtherCalls();
+            _fixtureRepositoryMock.VerifyNoOtherCalls();
+        }
+
 
         [Fact]
         public async Task GetClubStatsAsync_ShouldAggregateMemberAndFixtureCounts()
