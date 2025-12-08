@@ -1,3 +1,4 @@
+using FaziCricketClub.API.Middleware;
 using FaziCricketClub.Application;
 using FaziCricketClub.Application.Validation.Seasons;
 using FaziCricketClub.Infrastructure;
@@ -21,6 +22,10 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+// Global exception handling should be one of the first middlewares
+app.UseCorrelationId();
+app.UseGlobalExceptionHandling();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
