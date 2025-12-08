@@ -29,6 +29,8 @@ namespace FaziCricketClub.Application
             services.AddScoped<IMemberService, MemberService>();
             services.AddScoped<IFixtureService, FixtureService>();
             services.AddScoped<IClubStatsService, ClubStatsService>();
+            services.AddScoped<IMatchResultService, MatchResultService>();
+            services.AddScoped<IPlayerStatsService, PlayerStatsService>();
 
             return services;
         }

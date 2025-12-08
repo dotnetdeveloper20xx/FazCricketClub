@@ -10,10 +10,140 @@ namespace FaziCricketClub.API.Controllers
     public class StatsController : ControllerBase
     {
         private readonly IClubStatsService _clubStatsService;
+        private readonly IPlayerStatsService _playerStatsService;
+        private readonly ILogger<StatsController> _logger;
 
-        public StatsController(IClubStatsService clubStatsService)
+        public StatsController(
+            IClubStatsService clubStatsService,
+            IPlayerStatsService playerStatsService,
+            ILogger<StatsController> logger)
         {
             _clubStatsService = clubStatsService;
+            _playerStatsService = playerStatsService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Returns batting statistics for a player, optionally filtered by season.
+        /// </summary>
+        [HttpGet("player/{memberId:int}/batting")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApiResponse<PlayerBattingStatsDto>>> GetPlayerBattingStatsAsync(
+            int memberId,
+            [FromQuery] int? seasonId,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogInformation(
+                "StatsController - GetPlayerBattingStatsAsync - MemberId={MemberId}, SeasonId={SeasonId}",
+                memberId, seasonId);
+
+            try
+            {
+                var stats = await _playerStatsService.GetBattingStatsAsync(
+                    memberId,
+                    seasonId,
+                    cancellationToken);
+
+                var response = ApiResponse<PlayerBattingStatsDto>.Ok(
+                    stats,
+                    "Player batting stats retrieved successfully.");
+
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var response = ApiResponse<PlayerBattingStatsDto>.Fail(ex.Message);
+                return NotFound(response);
+            }
+        }
+
+
+        /// <summary>
+        /// Returns bowling statistics for a player, optionally filtered by season.
+        /// </summary>
+        [HttpGet("player/{memberId:int}/bowling")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApiResponse<PlayerBowlingStatsDto>>> GetPlayerBowlingStatsAsync(
+            int memberId,
+            [FromQuery] int? seasonId,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogInformation(
+                "StatsController - GetPlayerBowlingStatsAsync - MemberId={MemberId}, SeasonId={SeasonId}",
+                memberId, seasonId);
+
+            try
+            {
+                var stats = await _playerStatsService.GetBowlingStatsAsync(
+                    memberId,
+                    seasonId,
+                    cancellationToken);
+
+                var response = ApiResponse<PlayerBowlingStatsDto>.Ok(
+                    stats,
+                    "Player bowling stats retrieved successfully.");
+
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var response = ApiResponse<PlayerBowlingStatsDto>.Fail(ex.Message);
+                return NotFound(response);
+            }
+        }
+
+        /// <summary>
+        /// Returns a batting leaderboard ordered by runs, then average, then strike rate.
+        /// </summary>
+        [HttpGet("leaderboard/batting")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<PlayerBattingLeaderboardEntryDto>>>> GetBattingLeaderboardAsync(
+            [FromQuery] int? seasonId,
+            [FromQuery] int topN = 10,
+            CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation(
+                "StatsController - GetBattingLeaderboardAsync - SeasonId={SeasonId}, TopN={TopN}",
+                seasonId, topN);
+
+            var leaderboard = await _playerStatsService.GetBattingLeaderboardAsync(
+                seasonId,
+                topN,
+                cancellationToken);
+
+            var response = ApiResponse<IEnumerable<PlayerBattingLeaderboardEntryDto>>.Ok(
+                leaderboard,
+                "Batting leaderboard retrieved successfully.");
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Returns a bowling leaderboard ordered by wickets, then average, then economy.
+        /// </summary>
+        [HttpGet("leaderboard/bowling")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<PlayerBowlingLeaderboardEntryDto>>>> GetBowlingLeaderboardAsync(
+            [FromQuery] int? seasonId,
+            [FromQuery] int topN = 10,
+            CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation(
+                "StatsController - GetBowlingLeaderboardAsync - SeasonId={SeasonId}, TopN={TopN}",
+                seasonId, topN);
+
+            var leaderboard = await _playerStatsService.GetBowlingLeaderboardAsync(
+                seasonId,
+                topN,
+                cancellationToken);
+
+            var response = ApiResponse<IEnumerable<PlayerBowlingLeaderboardEntryDto>>.Ok(
+                leaderboard,
+                "Bowling leaderboard retrieved successfully.");
+
+            return Ok(response);
         }
 
 

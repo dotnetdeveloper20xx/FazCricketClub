@@ -39,6 +39,9 @@ namespace FaziCricketClub.Infrastructure
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IMemberRepository, MemberRepository>();
             services.AddScoped<IFixtureRepository, FixtureRepository>();
+            services.AddScoped<IMatchResultRepository, MatchResultRepository>();
+            services.AddScoped<IBattingScoreRepository, BattingScoreRepository>();
+            services.AddScoped<IBowlingFigureRepository, BowlingFigureRepository>();
 
             return services;
         }

@@ -14,10 +14,105 @@ namespace FaziCricketClub.API.Controllers
     public class FixturesController : ControllerBase
     {
         private readonly IFixtureService _fixtureService;
+        private readonly IMatchResultService _matchResultService;
+        private readonly ILogger<FixturesController> _logger;
 
-        public FixturesController(IFixtureService fixtureService)
+        public FixturesController(
+            IFixtureService fixtureService,
+            IMatchResultService matchResultService,
+            ILogger<FixturesController> logger)
         {
             _fixtureService = fixtureService;
+            _matchResultService = matchResultService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Deletes the match result and scorecards for the given fixture, if present.
+        /// Does not delete the fixture itself.
+        /// </summary>
+        /// <param name="fixtureId">The ID of the fixture.</param>
+        [HttpDelete("{fixtureId:int}/result")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DeleteResultAsync(
+            int fixtureId,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Deleting match result for FixtureId={FixtureId}", fixtureId);
+
+            await _matchResultService.DeleteMatchResultAsync(fixtureId, cancellationToken);
+
+            return NoContent();
+        }
+
+
+        /// <summary>
+        /// Creates or updates the match result and scorecards for a fixture.
+        /// If a result already exists, it is replaced with the new data.
+        /// Also marks the fixture as completed.
+        /// </summary>
+        /// <param name="fixtureId">The ID of the fixture.</param>
+        /// <param name="request">Match result summary and scorecards.</param>
+        [HttpPost("{fixtureId:int}/result")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ApiResponse<MatchResultDetailDto>>> UpsertResultAsync(
+            int fixtureId,
+            [FromBody] MatchResultUpsertDto request,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Upserting match result for FixtureId={FixtureId}", fixtureId);
+
+            if (!ModelState.IsValid)
+            {
+                var errorResponse = ApiResponse<MatchResultDetailDto>.Fail(
+                    "Match result payload is invalid.",
+                    ModelState);
+
+                return BadRequest(errorResponse);
+            }
+
+            var detail = await _matchResultService.UpsertMatchResultAsync(
+                fixtureId,
+                request,
+                cancellationToken);
+
+            var response = ApiResponse<MatchResultDetailDto>.Ok(
+                detail,
+                "Match result saved successfully.");
+
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Gets the recorded match result and scorecards for a fixture, if any.
+        /// </summary>
+        /// <param name="fixtureId">The ID of the fixture.</param>
+        [HttpGet("{fixtureId:int}/result")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApiResponse<MatchResultDetailDto>>> GetResultAsync(
+            int fixtureId,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Getting match result for FixtureId={FixtureId}", fixtureId);
+
+            var detail = await _matchResultService.GetByFixtureIdAsync(fixtureId, cancellationToken);
+
+            if (detail is null)
+            {
+                var notFoundResponse = ApiResponse<MatchResultDetailDto>.Fail(
+                    $"No match result found for fixture {fixtureId}.");
+
+                return NotFound(notFoundResponse);
+            }
+
+            var response = ApiResponse<MatchResultDetailDto>.Ok(
+                detail,
+                "Match result retrieved successfully.");
+
+            return Ok(response);
         }
 
 

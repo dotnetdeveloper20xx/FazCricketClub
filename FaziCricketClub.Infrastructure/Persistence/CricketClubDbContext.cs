@@ -38,6 +38,15 @@ namespace FaziCricketClub.Infrastructure.Persistence
         /// </summary>
         public DbSet<Fixture> Fixtures => Set<Fixture>();
 
+        public DbSet<MatchResult> MatchResults { get; set; } = null!;
+        public DbSet<BattingScore> BattingScores { get; set; } = null!;
+        public DbSet<BowlingFigure> BowlingFigures { get; set; } = null!;
+
+        public DbSet<FixtureAvailability> FixtureAvailabilities { get; set; } = null!;
+        public DbSet<FixtureSelection> FixtureSelections { get; set; } = null!;
+        public DbSet<FixtureSelectionPlayer> FixtureSelectionPlayers { get; set; } = null!;
+
+
         /// <summary>
         /// Configures the EF Core model.
         /// Applies all IEntityTypeConfiguration implementations from this assembly.

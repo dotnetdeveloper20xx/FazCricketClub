@@ -51,5 +51,15 @@
         /// Teams the member belongs to (many-to-many via a join entity later).
         /// </summary>
         public ICollection<Team> Teams { get; set; } = new List<Team>();
+
+        public ICollection<BattingScore> BattingScores { get; set; } = new List<BattingScore>();
+
+        public ICollection<BowlingFigure> BowlingFigures { get; set; } = new List<BowlingFigure>();
+
+        public ICollection<FixtureAvailability> FixtureAvailabilities { get; set; } = new List<FixtureAvailability>();
+
+        public ICollection<FixtureSelectionPlayer> FixtureSelections { get; set; } = new List<FixtureSelectionPlayer>();
+
+
     }
 }

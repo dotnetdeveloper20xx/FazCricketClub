@@ -40,6 +40,13 @@
         /// </summary>
         public Team? AwayTeam { get; set; }
 
+        public MatchResult? MatchResult { get; set; }
+
+        public ICollection<BattingScore> BattingScores { get; set; } = new List<BattingScore>();
+
+        public ICollection<BowlingFigure> BowlingFigures { get; set; } = new List<BowlingFigure>();
+
+
         /// <summary>
         /// The date and time when the fixture is scheduled to start.
         /// </summary>
@@ -65,5 +72,10 @@
         /// True means logically deleted; it should not appear in normal queries.
         /// </summary>
         public bool IsDeleted { get; set; } = false;
+
+        public ICollection<FixtureAvailability> Availabilities { get; set; } = new List<FixtureAvailability>();
+
+        public FixtureSelection? Selection { get; set; }
+
     }
 }
