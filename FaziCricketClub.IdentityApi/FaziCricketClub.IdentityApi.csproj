@@ -1,24 +1,40 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<!-- Target .NET 10 (future version in your learning journey) -->
+		<!-- Target .NET 10 as per our learning/prototype setup -->
 		<TargetFramework>net10.0</TargetFramework>
 
-		<!-- Enable nullable reference types to catch potential null issues at compile time -->
+		<!-- Enable nullable reference types -->
 		<Nullable>enable</Nullable>
 
-		<!-- Enable implicit usings for common namespaces (System, System.Linq, etc.) -->
+		<!-- Enable implicit usings for common namespaces -->
 		<ImplicitUsings>enable</ImplicitUsings>
 
-		<!-- Treat all warnings as errors in this project to enforce high code quality -->
+		<!-- Enforce high code quality: treat all warnings as errors -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
-		<!-- For demo purposes, we don’t enable trimming/AOT yet; we can evolve later -->
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-	  <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+		<!-- ASP.NET Core Identity + EntityFrameworkCore integration -->
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+
+		<!-- EF Core SQL Server provider (for Identity database storage) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+
+		<!-- Optional but recommended: tools for migrations (dotnet ef) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+
+		<!-- JWT bearer authentication for APIs -->
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+
+
+		<!-- Swagger is already configured in Program.cs; the transitive references are enough.
+         If you want explicit packages, you can add Swashbuckle here later. -->
 	</ItemGroup>
 
 </Project>
