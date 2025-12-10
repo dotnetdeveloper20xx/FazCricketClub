@@ -13,7 +13,7 @@ namespace FaziCricketClub.IdentityApi.Services
     /// Default implementation of <see cref="ITokenService"/> using JWT.
     /// 
     /// Responsibilities:
-    /// - Build a set of claims for the user (sub, name, email, roles, etc.).
+    /// - Build a set of claims for the user (sub, name, email, roles, permissions, etc.).
     /// - Sign the token using a symmetric secret from <see cref="JwtSettings"/>.
     /// - Respect token lifetime (AccessTokenExpirationMinutes).
     /// </summary>
@@ -21,18 +21,22 @@ namespace FaziCricketClub.IdentityApi.Services
     {
         private readonly JwtSettings jwtSettings;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtTokenService"/> class.
         /// </summary>
         /// <param name="jwtOptions">JWT configuration options.</param>
         /// <param name="userManager">User manager to fetch user details and roles.</param>
+        /// <param name="roleManager">Role manager to fetch role claims (permissions).</param>
         public JwtTokenService(
             IOptions<JwtSettings> jwtOptions,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager)
         {
             this.jwtSettings = jwtOptions.Value ?? throw new ArgumentNullException(nameof(jwtOptions));
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
 
             if (string.IsNullOrWhiteSpace(this.jwtSettings.Key))
             {
@@ -48,7 +52,7 @@ namespace FaziCricketClub.IdentityApi.Services
                 throw new ArgumentNullException(nameof(user));
             }
 
-            // Build standard and custom claims for the JWT.
+            // Build standard, role, and permission claims for the JWT.
             var claims = await this.BuildClaimsAsync(user);
 
             // Create the signing key from the configured secret.
@@ -78,10 +82,10 @@ namespace FaziCricketClub.IdentityApi.Services
         /// Builds the list of claims that will be embedded in the JWT token.
         /// Includes:
         /// - Subject identifier (sub)
-        /// - Name identifier
-        /// - User name and email
+        /// - Name identifier, name, email
         /// - JTI (unique token ID) for traceability
-        /// - Role claims (for [Authorize(Roles = "...")] support)
+        /// - Role claims (for [Authorize(Roles = "...")])
+        /// - Permission claims (for fine-grained UI/backend control)
         /// </summary>
         /// <param name="user">The application user.</param>
         /// <returns>A list of claims.</returns>
@@ -104,9 +108,31 @@ namespace FaziCricketClub.IdentityApi.Services
             // Attach user roles as separate claims.
             var roles = await this.userManager.GetRolesAsync(user);
 
-            foreach (var role in roles)
+            foreach (var roleName in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim(ClaimTypes.Role, roleName));
+
+                // For each role, also bring over its permission claims.
+                var role = await this.roleManager.FindByNameAsync(roleName);
+                if (role == null)
+                {
+                    continue;
+                }
+
+                var roleClaims = await this.roleManager.GetClaimsAsync(role);
+
+                // We only care about permission-type claims here.
+                foreach (var rc in roleClaims)
+                {
+                    if (rc.Type.Equals("permission", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Avoid duplicates: only add if not already present.
+                        if (!claims.Exists(c => c.Type == rc.Type && c.Value == rc.Value))
+                        {
+                            claims.Add(new Claim(rc.Type, rc.Value));
+                        }
+                    }
+                }
             }
 
             return claims;

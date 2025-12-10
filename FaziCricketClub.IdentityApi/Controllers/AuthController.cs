@@ -174,8 +174,10 @@ namespace FaziCricketClub.IdentityApi.Controllers
         }
 
         /// <summary>
-        /// Returns basic information about the currently authenticated user.
-        /// Useful for testing that JWT authentication and authorization work.
+        /// Returns basic information about the currently authenticated user,
+        /// including roles and permissions extracted from the JWT.
+        /// Useful for testing that JWT authentication and authorization work,
+        /// and for the frontend to drive UI behavior.
         /// </summary>
         [Authorize]
         [HttpGet("me")]
@@ -188,12 +190,16 @@ namespace FaziCricketClub.IdentityApi.Controllers
             var email = this.User.FindFirstValue(ClaimTypes.Email);
             var roles = this.User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToArray();
 
+            // Permissions are represented as claims of type "permission" in our JWT.
+            var permissions = this.User.FindAll("permission").Select(p => p.Value).ToArray();
+
             var response = new
             {
                 UserId = userId,
                 UserName = userName,
                 Email = email,
-                Roles = roles
+                Roles = roles,
+                Permissions = permissions
             };
 
             return this.Ok(response);

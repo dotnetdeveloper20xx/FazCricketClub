@@ -1,6 +1,7 @@
 using FaziCricketClub.IdentityApi.Configuration;
 using FaziCricketClub.IdentityApi.Data;
 using FaziCricketClub.IdentityApi.Entities;
+using FaziCricketClub.IdentityApi.Infrastructure;
 using FaziCricketClub.IdentityApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -75,12 +76,15 @@ builder.Services
     .AddSignInManager<SignInManager<ApplicationUser>>() // Required for login checks.
     .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+
 // ------------------------------------------------------------
 // AUTHENTICATION + AUTHORIZATION
 // ------------------------------------------------------------
 
 // Configure JWT bearer authentication.
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
+
 
 builder.Services
     .AddAuthentication(options =>
@@ -127,6 +131,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// ------------------------------------------------------------
+// SEED IDENTITY DATA (ROLES + PERMISSIONS)
+// ------------------------------------------------------------
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IdentityDataSeeder>();
+    await seeder.SeedAsync();
+}
+
 
 // ------------------------------------------------------------
 // MIDDLEWARE PIPELINE
