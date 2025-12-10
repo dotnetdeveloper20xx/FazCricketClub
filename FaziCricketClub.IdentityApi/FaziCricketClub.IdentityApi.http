@@ -1,0 +1,6 @@
+@FaziCricketClub.IdentityApi_HostAddress = http://localhost:5105
+
+GET {{FaziCricketClub.IdentityApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
