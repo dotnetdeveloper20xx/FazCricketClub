@@ -2,6 +2,7 @@ using FaziCricketClub.IdentityApi.Configuration;
 using FaziCricketClub.IdentityApi.Data;
 using FaziCricketClub.IdentityApi.Entities;
 using FaziCricketClub.IdentityApi.Infrastructure;
+using FaziCricketClub.IdentityApi.Security;
 using FaziCricketClub.IdentityApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -89,13 +90,11 @@ var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key
 builder.Services
     .AddAuthentication(options =>
     {
-        // Use JWT bearer as the default scheme for authentication.
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
-        // In development, this can help debug token-related issues.
         options.RequireHttpsMetadata = true;
         options.SaveToken = true;
 
@@ -103,20 +102,41 @@ builder.Services
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = signingKey,
-
             ValidateIssuer = true,
             ValidIssuer = jwtSettings.Issuer,
-
             ValidateAudience = true,
             ValidAudience = jwtSettings.Audience,
-
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(1) // Allow small clock drift.
+            ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
 
-// Register authorization services (policies can be added later).
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Policy: user must have Admin.ManageUsers permission.
+    options.AddPolicy("CanManageUsers", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Admin_ManageUsers);
+    });
+
+    // Policy: user must have Admin.ManageRoles permission.
+    options.AddPolicy("CanManageRoles", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Admin_ManageRoles);
+    });
+
+    // Policy: user must have Admin.ManagePermissions permission.
+    options.AddPolicy("CanManagePermissions", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Admin_ManagePermissions);
+    });
+
+    // You can add more fine-grained policies later, e.g.:
+    // options.AddPolicy("CanEditPlayers", p => p.RequireClaim("permission", AppPermissions.Players_Edit));
+});
 
 // ------------------------------------------------------------
 // APPLICATION SERVICES
