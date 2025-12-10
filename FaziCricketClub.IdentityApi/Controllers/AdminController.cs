@@ -142,5 +142,221 @@ namespace FaziCricketClub.IdentityApi.Controllers
 
             return this.Ok(response);
         }
+
+        /// <summary>
+        /// Assigns a role to a user.
+        /// Requires both:
+        /// - CanManageUsers (you are allowed to manage users), and
+        /// - CanManageRoles (you are allowed to manipulate role assignments).
+        /// </summary>
+        /// <param name="userId">User Id (GUID) to modify.</param>
+        /// <param name="request">Role assignment payload.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpPost("users/{userId:guid}/roles")]
+        [Authorize(Policy = "CanManageUsers")]
+        [Authorize(Policy = "CanManageRoles")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> AssignRoleToUserAsync(Guid userId, [FromBody] AssignRoleRequest request)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.ValidationProblem(this.ModelState);
+            }
+
+            this.logger.LogInformation(
+                "Admin {Admin} assigning role {Role} to user {UserId}.",
+                this.User.Identity?.Name, request.RoleName, userId);
+
+            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return this.NotFound($"User with id '{userId}' was not found.");
+            }
+
+            var role = await this.roleManager.FindByNameAsync(request.RoleName);
+            if (role == null)
+            {
+                return this.BadRequest($"Role '{request.RoleName}' does not exist.");
+            }
+
+            var userRoles = await this.userManager.GetRolesAsync(user);
+            if (userRoles.Contains(request.RoleName))
+            {
+                // No-op if already in role.
+                return this.NoContent();
+            }
+
+            var result = await this.userManager.AddToRoleAsync(user, request.RoleName);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to assign role {Role} to user {UserId}: {Errors}",
+                    request.RoleName, userId, errors);
+
+                return this.BadRequest(new { message = "Failed to assign role.", errors });
+            }
+
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Removes a role from a user.
+        /// Requires both CanManageUsers and CanManageRoles.
+        /// </summary>
+        /// <param name="userId">User Id (GUID) to modify.</param>
+        /// <param name="roleName">Role name to remove.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpDelete("users/{userId:guid}/roles/{roleName}")]
+        [Authorize(Policy = "CanManageUsers")]
+        [Authorize(Policy = "CanManageRoles")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> RemoveRoleFromUserAsync(Guid userId, string roleName)
+        {
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                return this.BadRequest("Role name must be provided.");
+            }
+
+            this.logger.LogInformation(
+                "Admin {Admin} removing role {Role} from user {UserId}.",
+                this.User.Identity?.Name, roleName, userId);
+
+            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return this.NotFound($"User with id '{userId}' was not found.");
+            }
+
+            var role = await this.roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                return this.BadRequest($"Role '{roleName}' does not exist.");
+            }
+
+            var userRoles = await this.userManager.GetRolesAsync(user);
+            if (!userRoles.Contains(roleName))
+            {
+                // No-op if the user does not have that role.
+                return this.NoContent();
+            }
+
+            var result = await this.userManager.RemoveFromRoleAsync(user, roleName);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to remove role {Role} from user {UserId}: {Errors}",
+                    roleName, userId, errors);
+
+                return this.BadRequest(new { message = "Failed to remove role.", errors });
+            }
+
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Locks a user account for a given duration (default 15 minutes if not specified).
+        /// Requires CanManageUsers permission.
+        /// </summary>
+        /// <param name="userId">User Id (GUID) to lock.</param>
+        /// <param name="request">Lockout settings.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpPost("users/{userId:guid}/lock")]
+        [Authorize(Policy = "CanManageUsers")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> LockUserAsync(Guid userId, [FromBody] LockUserRequest request)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.ValidationProblem(this.ModelState);
+            }
+
+            var minutes = request.Minutes ?? 15;
+            if (minutes <= 0)
+            {
+                minutes = 15;
+            }
+
+            this.logger.LogInformation(
+                "Admin {Admin} locking user {UserId} for {Minutes} minutes.",
+                this.User.Identity?.Name, userId, minutes);
+
+            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return this.NotFound($"User with id '{userId}' was not found.");
+            }
+
+            var lockoutEnd = DateTimeOffset.UtcNow.AddMinutes(minutes);
+            var result = await this.userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to lock user {UserId}: {Errors}",
+                    userId, errors);
+
+                return this.BadRequest(new { message = "Failed to lock user.", errors });
+            }
+
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Unlocks a user account immediately.
+        /// Requires CanManageUsers permission.
+        /// </summary>
+        /// <param name="userId">User Id (GUID) to unlock.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpPost("users/{userId:guid}/unlock")]
+        [Authorize(Policy = "CanManageUsers")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> UnlockUserAsync(Guid userId)
+        {
+            this.logger.LogInformation(
+                "Admin {Admin} unlocking user {UserId}.",
+                this.User.Identity?.Name, userId);
+
+            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return this.NotFound($"User with id '{userId}' was not found.");
+            }
+
+            // Reset lockout end to now, effectively unlocking the user.
+            var result = await this.userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to unlock user {UserId}: {Errors}",
+                    userId, errors);
+
+                return this.BadRequest(new { message = "Failed to unlock user.", errors });
+            }
+
+            // Optionally reset access failed count.
+            await this.userManager.ResetAccessFailedCountAsync(user);
+
+            return this.NoContent();
+        }
+
     }
 }
