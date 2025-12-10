@@ -1,5 +1,6 @@
 ﻿using FaziCricketClub.IdentityApi.Entities;
 using FaziCricketClub.IdentityApi.Models.Admin;
+using FaziCricketClub.IdentityApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -357,6 +358,169 @@ namespace FaziCricketClub.IdentityApi.Controllers
 
             return this.NoContent();
         }
+
+        /// <summary>
+        /// Returns the full catalog of known permissions in the system.
+        /// Requires CanManagePermissions policy.
+        /// 
+        /// Useful for:
+        /// - Building admin UI screens where an Admin can map permissions to roles.
+        /// - Showing a reference list of all abilities.
+        /// </summary>
+        [HttpGet("permissions")]
+        [Authorize(Policy = "CanManagePermissions")]
+        [ProducesResponseType(typeof(IEnumerable<PermissionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public IActionResult GetPermissions()
+        {
+            this.logger.LogInformation(
+                "Admin {Admin} requested full permission catalog.",
+                this.User.Identity?.Name);
+
+            var permissions = AppPermissions.All
+                .Select(p => new PermissionDto
+                {
+                    Value = p,
+                    Description = p // For now, description = value. Can be extended.
+                })
+                .OrderBy(p => p.Value)
+                .ToList();
+
+            return this.Ok(permissions);
+        }
+
+        /// <summary>
+        /// Adds a permission to a role by creating a role claim of type "permission".
+        /// Requires both CanManageRoles and CanManagePermissions policies.
+        /// </summary>
+        /// <param name="roleName">Name of the role to modify (e.g. "Admin").</param>
+        /// <param name="request">Permission assignment payload.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpPost("roles/{roleName}/permissions")]
+        [Authorize(Policy = "CanManageRoles")]
+        [Authorize(Policy = "CanManagePermissions")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> AddPermissionToRoleAsync(string roleName, [FromBody] RolePermissionRequest request)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.ValidationProblem(this.ModelState);
+            }
+
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                return this.BadRequest("Role name must be provided.");
+            }
+
+            // Optional: validate that the requested permission is part of our known catalog.
+            if (!AppPermissions.All.Contains(request.Permission))
+            {
+                return this.BadRequest($"Permission '{request.Permission}' is not recognised.");
+            }
+
+            this.logger.LogInformation(
+                "Admin {Admin} adding permission {Permission} to role {Role}.",
+                this.User.Identity?.Name, request.Permission, roleName);
+
+            var role = await this.roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                return this.NotFound($"Role '{roleName}' does not exist.");
+            }
+
+            var existingClaims = await this.roleManager.GetClaimsAsync(role);
+            var hasPermission = existingClaims.Any(c =>
+                c.Type.Equals("permission", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(c.Value, request.Permission, StringComparison.OrdinalIgnoreCase));
+
+            if (hasPermission)
+            {
+                // No-op if the role already has this permission.
+                return this.NoContent();
+            }
+
+            var claim = new Claim("permission", request.Permission);
+            var result = await this.roleManager.AddClaimAsync(role, claim);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to add permission {Permission} to role {Role}: {Errors}",
+                    request.Permission, roleName, errors);
+
+                return this.BadRequest(new { message = "Failed to add permission to role.", errors });
+            }
+
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Removes a permission from a role by deleting the corresponding role claim.
+        /// Requires both CanManageRoles and CanManagePermissions policies.
+        /// </summary>
+        /// <param name="roleName">Name of the role to modify.</param>
+        /// <param name="permission">Permission value to remove.</param>
+        /// <returns>NoContent on success, or an error result.</returns>
+        [HttpDelete("roles/{roleName}/permissions/{permission}")]
+        [Authorize(Policy = "CanManageRoles")]
+        [Authorize(Policy = "CanManagePermissions")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> RemovePermissionFromRoleAsync(string roleName, string permission)
+        {
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                return this.BadRequest("Role name must be provided.");
+            }
+
+            if (string.IsNullOrWhiteSpace(permission))
+            {
+                return this.BadRequest("Permission must be provided.");
+            }
+
+            this.logger.LogInformation(
+                "Admin {Admin} removing permission {Permission} from role {Role}.",
+                this.User.Identity?.Name, permission, roleName);
+
+            var role = await this.roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                return this.NotFound($"Role '{roleName}' does not exist.");
+            }
+
+            var existingClaims = await this.roleManager.GetClaimsAsync(role);
+            var claimToRemove = existingClaims.FirstOrDefault(c =>
+                c.Type.Equals("permission", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(c.Value, permission, StringComparison.OrdinalIgnoreCase));
+
+            if (claimToRemove == null)
+            {
+                // No-op if the role does not have that permission.
+                return this.NoContent();
+            }
+
+            var result = await this.roleManager.RemoveClaimAsync(role, claimToRemove);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                this.logger.LogWarning(
+                    "Failed to remove permission {Permission} from role {Role}: {Errors}",
+                    permission, roleName, errors);
+
+                return this.BadRequest(new { message = "Failed to remove permission from role.", errors });
+            }
+
+            return this.NoContent();
+        }
+
+
 
     }
 }
