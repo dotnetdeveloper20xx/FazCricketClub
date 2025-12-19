@@ -1,6 +1,7 @@
 ﻿using FaziCricketClub.Application.Interfaces;
 using FaziCricketClub.Application.Services;
 using FaziCricketClub.Domain.Entities;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;

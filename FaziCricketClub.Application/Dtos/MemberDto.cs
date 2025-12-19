@@ -15,6 +15,8 @@
 
         public DateTime? DateOfBirth { get; set; }
 
+        public DateTime JoinedOn { get; set; }
+
         public bool IsActive { get; set; }
 
         public string? Notes { get; set; }

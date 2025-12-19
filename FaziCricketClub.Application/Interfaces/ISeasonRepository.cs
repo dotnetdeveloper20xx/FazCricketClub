@@ -14,6 +14,12 @@ namespace FaziCricketClub.Application.Interfaces
         Task AddAsync(Season season, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Updates the specified season in the data store.
+        /// </summary>
+        /// <param name="season">The season to update.</param>
+        void Update(Season season);
+
+        /// <summary>
         /// Removes the specified season from the data store.
         /// </summary>
         /// <param name="season">The season to remove.</param>

@@ -37,6 +37,11 @@ namespace FaziCricketClub.Infrastructure.Repositories
             await _dbContext.Fixtures.AddAsync(fixture, cancellationToken);
         }
 
+        public void Update(Fixture fixture)
+        {
+            _dbContext.Fixtures.Update(fixture);
+        }
+
         /// <summary>
         /// Soft deletes the fixture by marking IsDeleted = true.
         /// </summary>

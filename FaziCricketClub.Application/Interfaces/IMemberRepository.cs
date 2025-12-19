@@ -13,6 +13,8 @@ namespace FaziCricketClub.Application.Interfaces
 
         Task AddAsync(Member member, CancellationToken cancellationToken = default);
 
+        void Update(Member member);
+
         void Remove(Member member);
     }
 }

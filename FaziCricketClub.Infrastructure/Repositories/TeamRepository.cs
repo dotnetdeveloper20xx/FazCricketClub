@@ -35,6 +35,11 @@ namespace FaziCricketClub.Infrastructure.Repositories
             await _dbContext.Teams.AddAsync(team, cancellationToken);
         }
 
+        public void Update(Team team)
+        {
+            _dbContext.Teams.Update(team);
+        }
+
         /// <summary>
         /// Soft deletes the team by setting IsDeleted to true.
         /// </summary>

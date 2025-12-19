@@ -13,6 +13,8 @@ namespace FaziCricketClub.Application.Interfaces
 
         Task AddAsync(Fixture fixture, CancellationToken cancellationToken = default);
 
+        void Update(Fixture fixture);
+
         void Remove(Fixture fixture);
     }
 }

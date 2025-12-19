@@ -1,0 +1,1417 @@
+{
+  "info": {
+    "name": "FazCricketClub API - Complete Guide",
+    "description": "Complete API documentation for FazCricketClub platform. Includes Identity API (authentication) and Main API (cricket club management).\n\n**Base URLs:**\n- Identity API: https://localhost:7001 (adjust port as needed)\n- Main API: https://localhost:7000 (adjust port as needed)\n\n**Authentication:**\nMost endpoints require JWT Bearer token. Get token from `/api/auth/login` or `/api/auth/register`.\n\n**Response Format:**\nAll successful responses follow this structure:\n```json\n{\n  \"success\": true,\n  \"message\": \"Operation successful\",\n  \"data\": { ... },\n  \"errors\": null\n}\n```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "identityApiUrl",
+      "value": "https://localhost:7276",
+      "type": "string"
+    },
+    {
+      "key": "mainApiUrl",
+      "value": "https://localhost:7108",
+      "type": "string"
+    },
+    {
+      "key": "bearerToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Identity API - Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/auth/register",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"player@fazcc.com\",\n  \"userName\": \"johndoe\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\",\n  \"role\": \"Player\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"expiresAtUtc\": \"2025-12-19T14:30:00Z\",\n  \"userId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"userName\": \"johndoe\",\n  \"email\": \"player@fazcc.com\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/auth/login",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"player@fazcc.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"expiresAtUtc\": \"2025-12-19T14:30:00Z\",\n  \"userId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"userName\": \"johndoe\",\n  \"email\": \"player@fazcc.com\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User Info (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/auth/me",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"userId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"userName\": \"johndoe\",\n  \"email\": \"player@fazcc.com\",\n  \"roles\": [\"Player\"],\n  \"permissions\": [\n    \"Players.View\",\n    \"Teams.View\",\n    \"Fixtures.View\"\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "👥 Admin API - User Management",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/roles",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "roles"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": \"role-guid-1\",\n    \"name\": \"Admin\",\n    \"permissions\": [\n      \"Admin.ManageUsers\",\n      \"Admin.ManageRoles\",\n      \"Admin.ManagePermissions\",\n      \"Players.View\",\n      \"Players.Edit\",\n      \"Teams.View\",\n      \"Teams.Edit\",\n      \"Fixtures.View\",\n      \"Fixtures.Edit\"\n    ]\n  },\n  {\n    \"id\": \"role-guid-2\",\n    \"name\": \"Captain\",\n    \"permissions\": [\n      \"Players.View\",\n      \"Players.Edit\",\n      \"Teams.View\",\n      \"Fixtures.View\",\n      \"Fixtures.Edit\"\n    ]\n  },\n  {\n    \"id\": \"role-guid-3\",\n    \"name\": \"Player\",\n    \"permissions\": [\n      \"Players.View\",\n      \"Teams.View\",\n      \"Fixtures.View\"\n    ]\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/users",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "users"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"userName\": \"admin\",\n    \"email\": \"admin@fazcc.com\",\n    \"isLockedOut\": false,\n    \"roles\": [\"Admin\"]\n  },\n  {\n    \"id\": \"user-guid-2\",\n    \"userName\": \"johndoe\",\n    \"email\": \"player@fazcc.com\",\n    \"isLockedOut\": false,\n    \"roles\": [\"Player\"]\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/users/:userId/roles",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "users", ":userId", "roles"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Captain\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Remove Role from User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/users/:userId/roles/:roleName",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "users", ":userId", "roles", ":roleName"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                },
+                {
+                  "key": "roleName",
+                  "value": "Captain"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Lock User Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/users/:userId/lock",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "users", ":userId", "lock"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"minutes\": 30\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Unlock User Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/users/:userId/unlock",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "users", ":userId", "unlock"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get All Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/permissions",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "permissions"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"value\": \"Admin.ManagePermissions\",\n    \"description\": \"Admin.ManagePermissions\"\n  },\n  {\n    \"value\": \"Admin.ManageRoles\",\n    \"description\": \"Admin.ManageRoles\"\n  },\n  {\n    \"value\": \"Admin.ManageUsers\",\n    \"description\": \"Admin.ManageUsers\"\n  },\n  {\n    \"value\": \"Fixtures.Edit\",\n    \"description\": \"Fixtures.Edit\"\n  },\n  {\n    \"value\": \"Fixtures.View\",\n    \"description\": \"Fixtures.View\"\n  },\n  {\n    \"value\": \"Players.Edit\",\n    \"description\": \"Players.Edit\"\n  },\n  {\n    \"value\": \"Players.View\",\n    \"description\": \"Players.View\"\n  },\n  {\n    \"value\": \"Teams.Edit\",\n    \"description\": \"Teams.Edit\"\n  },\n  {\n    \"value\": \"Teams.View\",\n    \"description\": \"Teams.View\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Add Permission to Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/roles/:roleName/permissions",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "roles", ":roleName", "permissions"],
+              "variable": [
+                {
+                  "key": "roleName",
+                  "value": "Player"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permission\": \"Fixtures.Edit\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Remove Permission from Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{identityApiUrl}}/api/admin/roles/:roleName/permissions/:permission",
+              "host": ["{{identityApiUrl}}"],
+              "path": ["api", "admin", "roles", ":roleName", "permissions", ":permission"],
+              "variable": [
+                {
+                  "key": "roleName",
+                  "value": "Player"
+                },
+                {
+                  "key": "permission",
+                  "value": "Fixtures.Edit"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🏏 Seasons Management",
+      "item": [
+        {
+          "name": "Get All Seasons",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/seasons",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "seasons"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": null,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"2025 Summer Season\",\n      \"description\": \"Main season for 2025\",\n      \"startDate\": \"2025-04-01T00:00:00\",\n      \"endDate\": \"2025-09-30T00:00:00\"\n    }\n  ],\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Season by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/seasons/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "seasons", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": null,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"2025 Summer Season\",\n    \"description\": \"Main season for 2025\",\n    \"startDate\": \"2025-04-01T00:00:00\",\n    \"endDate\": \"2025-09-30T00:00:00\"\n  },\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Season",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/seasons",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "seasons"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"2026 Summer Season\",\n  \"description\": \"Upcoming season for 2026\",\n  \"startDate\": \"2026-04-01T00:00:00\",\n  \"endDate\": \"2026-09-30T00:00:00\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Season created successfully.\",\n  \"data\": {\n    \"id\": 2,\n    \"name\": \"2026 Summer Season\",\n    \"description\": \"Upcoming season for 2026\",\n    \"startDate\": \"2026-04-01T00:00:00\",\n    \"endDate\": \"2026-09-30T00:00:00\"\n  },\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Season",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/seasons/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "seasons", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"2025 Summer Season - Updated\",\n  \"description\": \"Updated description\",\n  \"startDate\": \"2025-04-01T00:00:00\",\n  \"endDate\": \"2025-10-15T00:00:00\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Delete Season",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/seasons/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "seasons", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🎯 Teams Management",
+      "item": [
+        {
+          "name": "Get All Teams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/teams",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "teams"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": null,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"1st XI\",\n      \"description\": \"First team\",\n      \"isActive\": true\n    },\n    {\n      \"id\": 2,\n      \"name\": \"2nd XI\",\n      \"description\": \"Second team\",\n      \"isActive\": true\n    }\n  ],\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Team by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/teams/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "teams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/teams",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "teams"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Under-19\",\n  \"description\": \"Youth team for players under 19\",\n  \"isActive\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Team",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/teams/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "teams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"1st XI - Seniors\",\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/teams/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "teams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Members Management",
+      "item": [
+        {
+          "name": "Get All Members (Paged)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/members?page=1&pageSize=20&search=john",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "members"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "description": "Items per page (default: 20)"
+                },
+                {
+                  "key": "search",
+                  "value": "john",
+                  "description": "Search by name or email (optional)"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Members retrieved successfully.\",\n  \"data\": {\n    \"items\": [\n      {\n        \"id\": 1,\n        \"fullName\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"phoneNumber\": \"+44 7700 900123\",\n        \"dateOfBirth\": \"1990-05-15T00:00:00\",\n        \"isActive\": true,\n        \"notes\": \"Excellent all-rounder\"\n      }\n    ],\n    \"totalCount\": 1,\n    \"page\": 1,\n    \"pageSize\": 20,\n    \"totalPages\": 1,\n    \"hasNext\": false,\n    \"hasPrevious\": false\n  },\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Member by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/members/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "members", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/members",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "members"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+44 7700 900123\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00\",\n  \"isActive\": true,\n  \"notes\": \"Excellent all-rounder\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Member",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/members/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "members", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.updated@example.com\",\n  \"phoneNumber\": \"+44 7700 900999\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00\",\n  \"isActive\": true,\n  \"notes\": \"Updated notes\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/members/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "members", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📅 Fixtures Management",
+      "item": [
+        {
+          "name": "Get All Fixtures (Paged)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures?page=1&pageSize=20&seasonId=1&teamId=1",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "seasonId",
+                  "value": "1",
+                  "description": "Filter by season (optional)"
+                },
+                {
+                  "key": "teamId",
+                  "value": "1",
+                  "description": "Filter by team (optional)"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-01-01",
+                  "description": "Filter from date (optional)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-12-31",
+                  "description": "Filter to date (optional)",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Upcoming Fixtures",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/upcoming?days=7&teamId=1",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", "upcoming"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7",
+                  "description": "Number of days ahead (default: 7)"
+                },
+                {
+                  "key": "teamId",
+                  "value": "1",
+                  "description": "Filter by team (optional)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Fixture by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Fixture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seasonId\": 1,\n  \"homeTeamId\": 1,\n  \"awayTeamId\": 2,\n  \"startDateTime\": \"2025-07-15T14:00:00\",\n  \"venue\": \"Lord's Cricket Ground\",\n  \"competitionName\": \"League Division 1\",\n  \"status\": \"Scheduled\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Fixture",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seasonId\": 1,\n  \"homeTeamId\": 1,\n  \"awayTeamId\": 2,\n  \"startDateTime\": \"2025-07-15T15:00:00\",\n  \"venue\": \"Lord's Cricket Ground\",\n  \"competitionName\": \"League Division 1\",\n  \"status\": \"Confirmed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Fixture",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:id",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Match Result",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":fixtureId", "result"],
+              "variable": [
+                {
+                  "key": "fixtureId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create/Update Match Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":fixtureId", "result"],
+              "variable": [
+                {
+                  "key": "fixtureId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"homeTeamRuns\": 245,\n  \"homeTeamWickets\": 8,\n  \"homeTeamOvers\": 50.0,\n  \"awayTeamRuns\": 220,\n  \"awayTeamWickets\": 10,\n  \"awayTeamOvers\": 48.3,\n  \"winningTeamId\": 1,\n  \"playerOfMatchId\": 5,\n  \"matchSummary\": \"Close victory by 25 runs\",\n  \"battingScores\": [\n    {\n      \"memberId\": 1,\n      \"teamId\": 1,\n      \"runs\": 87,\n      \"ballsFaced\": 65,\n      \"fours\": 10,\n      \"sixes\": 2,\n      \"howOut\": \"Caught\",\n      \"bowlerId\": 10\n    }\n  ],\n  \"bowlingFigures\": [\n    {\n      \"memberId\": 10,\n      \"teamId\": 2,\n      \"overs\": 10.0,\n      \"maidens\": 2,\n      \"runs\": 45,\n      \"wickets\": 3,\n      \"wides\": 4,\n      \"noBalls\": 1\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Match Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "fixtures", ":fixtureId", "result"],
+              "variable": [
+                {
+                  "key": "fixtureId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Statistics & Analytics",
+      "item": [
+        {
+          "name": "Get Club Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/club",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "club"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Club stats retrieved successfully.\",\n  \"data\": {\n    \"totalMembers\": 45,\n    \"activeMembers\": 38,\n    \"totalTeams\": 4,\n    \"totalSeasons\": 3,\n    \"totalFixtures\": 120,\n    \"completedFixtures\": 85,\n    \"upcomingFixtures\": 35\n  },\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Player Batting Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/player/:memberId/batting?seasonId=1",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "player", ":memberId", "batting"],
+              "query": [
+                {
+                  "key": "seasonId",
+                  "value": "1",
+                  "description": "Filter by season (optional)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "memberId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Player batting stats retrieved successfully.\",\n  \"data\": {\n    \"memberId\": 1,\n    \"memberName\": \"John Doe\",\n    \"innings\": 15,\n    \"notOuts\": 3,\n    \"totalRuns\": 587,\n    \"highestScore\": 92,\n    \"average\": 48.92,\n    \"strikeRate\": 85.5,\n    \"totalFours\": 65,\n    \"totalSixes\": 12,\n    \"centuries\": 0,\n    \"halfCenturies\": 5\n  },\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Player Bowling Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/player/:memberId/bowling?seasonId=1",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "player", ":memberId", "bowling"],
+              "query": [
+                {
+                  "key": "seasonId",
+                  "value": "1",
+                  "description": "Filter by season (optional)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "memberId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Batting Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/leaderboard/batting?seasonId=1&topN=10",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "leaderboard", "batting"],
+              "query": [
+                {
+                  "key": "seasonId",
+                  "value": "1",
+                  "description": "Filter by season (optional)"
+                },
+                {
+                  "key": "topN",
+                  "value": "10",
+                  "description": "Number of top players (default: 10)"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Batting leaderboard retrieved successfully.\",\n  \"data\": [\n    {\n      \"rank\": 1,\n      \"memberId\": 1,\n      \"memberName\": \"John Doe\",\n      \"innings\": 15,\n      \"totalRuns\": 587,\n      \"average\": 48.92,\n      \"strikeRate\": 85.5,\n      \"centuries\": 0,\n      \"halfCenturies\": 5\n    }\n  ],\n  \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Bowling Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/leaderboard/bowling?seasonId=1&topN=10",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "leaderboard", "bowling"],
+              "query": [
+                {
+                  "key": "seasonId",
+                  "value": "1"
+                },
+                {
+                  "key": "topN",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Fixtures By Season",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/fixtures-by-season",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "fixtures-by-season"]
+            }
+          }
+        },
+        {
+          "name": "Get Fixtures By Team",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/fixtures-by-team",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "fixtures-by-team"]
+            }
+          }
+        },
+        {
+          "name": "Get Fixture Activity Over Time",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/fixture-activity?from=2025-01-01&to=2025-12-31&seasonId=1",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "fixture-activity"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01",
+                  "description": "Start date (optional)"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-31",
+                  "description": "End date (optional)"
+                },
+                {
+                  "key": "seasonId",
+                  "value": "1",
+                  "description": "Filter by season (optional)"
+                },
+                {
+                  "key": "teamId",
+                  "value": "1",
+                  "description": "Filter by team (optional)",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Member Activity Over Time",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/stats/member-activity?from=2025-01-01&to=2025-12-31",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "stats", "member-activity"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-31"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mainApiUrl}}/api/health",
+              "host": ["{{mainApiUrl}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"OK\",\n  \"service\": \"CricketClub.WebApi\",\n  \"timestampUtc\": \"2025-12-19T12:30:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

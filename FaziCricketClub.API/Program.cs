@@ -5,6 +5,7 @@ using FaziCricketClub.Application;
 using FaziCricketClub.Application.Validation.Seasons;
 using FaziCricketClub.Infrastructure;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 

@@ -1,0 +1,181 @@
+﻿[
+  {
+    "name": "Get Fixture by ID",
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:id",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":id" ],
+        "variable": [
+          {
+            "key": "id",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "Create Fixture",
+    "request": {
+      "method": "POST",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures" ]
+      },
+      "body": {
+        "mode": "raw",
+        "raw": "{\n  \"seasonId\": 1,\n  \"homeTeamId\": 1,\n  \"awayTeamId\": 2,\n  \"startDateTime\": \"2025-07-15T14:00:00\",\n  \"venue\": \"Lord's Cricket Ground\",\n  \"competitionName\": \"League Division 1\",\n  \"status\": \"Scheduled\"\n}"
+      }
+    }
+  },
+  {
+    "name": "Update Fixture",
+    "request": {
+      "method": "PUT",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:id",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":id" ],
+        "variable": [
+          {
+            "key": "id",
+            "value": "1"
+          }
+        ]
+      },
+      "body": {
+        "mode": "raw",
+        "raw": "{\n  \"seasonId\": 1,\n  \"homeTeamId\": 1,\n  \"awayTeamId\": 2,\n  \"startDateTime\": \"2025-07-15T15:00:00\",\n  \"venue\": \"Lord's Cricket Ground\",\n  \"competitionName\": \"League Division 1\",\n  \"status\": \"Confirmed\"\n}"
+      }
+    }
+  },
+  {
+    "name": "Delete Fixture",
+    "request": {
+      "method": "DELETE",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:id",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":id" ],
+        "variable": [
+          {
+            "key": "id",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "Get Match Result",
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":fixtureId", "result" ],
+        "variable": [
+          {
+            "key": "fixtureId",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "Create/Update Match Result",
+    "request": {
+      "method": "POST",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":fixtureId", "result" ],
+        "variable": [
+          {
+            "key": "fixtureId",
+            "value": "1"
+          }
+        ]
+      },
+      "body": {
+        "mode": "raw",
+        "raw": "{\n  \"homeTeamRuns\": 245,\n  \"homeTeamWickets\": 8,\n  \"homeTeamOvers\": 50.0,\n  \"awayTeamRuns\": 220,\n  \"awayTeamWickets\": 10,\n  \"awayTeamOvers\": 48.3,\n  \"winningTeamId\": 1,\n  \"playerOfMatchId\": 5,\n  \"matchSummary\": \"Close victory by 25 runs\",\n  \"battingScores\": [\n    {\n      \"memberId\": 1,\n      \"teamId\": 1,\n      \"runs\": 87,\n      \"ballsFaced\": 65,\n      \"fours\": 10,\n      \"sixes\": 2,\n      \"howOut\": \"Caught\",\n      \"bowlerId\": 10\n    }\n  ],\n  \"bowlingFigures\": [\n    {\n      \"memberId\": 10,\n      \"teamId\": 2,\n      \"overs\": 10.0,\n      \"maidens\": 2,\n      \"runs\": 45,\n      \"wickets\": 3,\n      \"wides\": 4,\n      \"noBalls\": 1\n    }\n  ]\n}"
+      }
+    }
+  },
+  {
+    "name": "Delete Match Result",
+    "request": {
+      "method": "DELETE",
+      "header": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{bearerToken}}"
+        }
+      ],
+      "url": {
+        "raw": "{{mainApiUrl}}/api/fixtures/:fixtureId/result",
+        "host": [ "{{mainApiUrl}}" ],
+        "path": [ "api", "fixtures", ":fixtureId", "result" ],
+        "variable": [
+          {
+            "key": "fixtureId",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  }
+]

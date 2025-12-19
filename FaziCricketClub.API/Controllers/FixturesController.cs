@@ -65,9 +65,18 @@ namespace FaziCricketClub.API.Controllers
 
             if (!ModelState.IsValid)
             {
+                var errors = ModelState
+                    .Where(ms => ms.Value?.Errors.Count > 0)
+                    .SelectMany(ms => ms.Value!.Errors.Select(e => new ApiError
+                    {
+                        Field = ms.Key,
+                        Message = e.ErrorMessage
+                    }))
+                    .ToList();
+
                 var errorResponse = ApiResponse<MatchResultDetailDto>.Fail(
                     "Match result payload is invalid.",
-                    ModelState);
+                    errors);
 
                 return BadRequest(errorResponse);
             }

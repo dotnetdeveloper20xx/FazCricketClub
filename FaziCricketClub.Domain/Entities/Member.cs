@@ -32,6 +32,11 @@
         public DateTime? DateOfBirth { get; set; }
 
         /// <summary>
+        /// Date when the member joined the club.
+        /// </summary>
+        public DateTime JoinedOn { get; set; }
+
+        /// <summary>
         /// Whether the member is currently active in the club.
         /// </summary>
         public bool IsActive { get; set; } = true;

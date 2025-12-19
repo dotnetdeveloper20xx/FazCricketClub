@@ -36,6 +36,15 @@ namespace FaziCricketClub.Infrastructure.Repositories
         }
 
         /// <summary>
+        /// Updates the specified season in the data store.
+        /// </summary>
+        /// <param name="season">The season to update.</param>
+        public void Update(Season season)
+        {
+            _dbContext.Seasons.Update(season);
+        }
+
+        /// <summary>
         /// Soft deletes the season by setting IsDeleted to true.
         /// </summary>
         public void Remove(Season season)

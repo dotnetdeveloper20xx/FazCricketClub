@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include all Angular source files in the project -->
+    <Content Include="src\**\*" />
+    <Content Include="*.json" />
+    <Content Include="*.md" />
+    <Content Include=".editorconfig" />
+
+    <!-- Exclude build artifacts and dependencies -->
+    <Content Remove="node_modules\**" />
+    <Content Remove="dist\**" />
+    <Content Remove=".angular\**" />
+    <Content Remove="coverage\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mark node_modules as invisible to avoid VS trying to load them -->
+    <None Remove="node_modules\**" />
+  </ItemGroup>
+
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Message Importance="high" Condition="'$(ErrorCode)' != '0'" Text="Node.js is not installed. Please install it from https://nodejs.org/" />
+  </Target>
+
+</Project>

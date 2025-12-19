@@ -25,7 +25,7 @@ namespace FaziCricketClub.Tests.Unit
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<CricketClubMappingProfile>();
-            },null);
+            });
 
             _mapper = config.CreateMapper();
 
