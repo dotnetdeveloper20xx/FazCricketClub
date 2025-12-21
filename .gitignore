@@ -36,3 +36,6 @@ packages/
 *.swp
 *.bak
 *.log
+
+## Claude Code
+.claude/
