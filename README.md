@@ -1,487 +1,689 @@
-﻿# 🏏 CricketClub – A Full-Stack .NET 10 / C# 14 Mastery Project
+# 🏏 Fazi Cricket Club Management System
 
-> **Status:** Planning & Design Phase (No code committed yet)  
-> **Goal:** Build a production-grade, end-to-end Cricket Club platform that exercises **every major concept** from *C# 14 and .NET 10 – Modern Cross-Platform Development Fundamentals*.
+A comprehensive, enterprise-grade Cricket Club Management System built with .NET 10.0, demonstrating modern software architecture patterns, security best practices, and full-stack development skills.
 
-This repository is the home of the **CricketClub** project: a realistic cricket club management platform designed to:
+[![.NET Version](https://img.shields.io/badge/.NET-10.0-blue)](https://dotnet.microsoft.com/)
+[![C# Version](https://img.shields.io/badge/C%23-14.0-purple)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-- Practice **modern C#** and **.NET 10** at a senior level.
-- Demonstrate **production-quality architecture** (Clean/Onion style).
-- Showcase **ASP.NET Core, Blazor, EF Core, SQL, Minimal APIs**, and more.
-- Serve as a **portfolio piece** and a **learning lab**.
+## 🎯 Project Overview
 
----
+This application provides a complete solution for managing cricket club operations, including team management, member profiles, match fixtures, scorecards, and comprehensive statistics tracking. Built with scalability and maintainability in mind, it showcases industry best practices in API design, security, and data management.
 
-## 📚 Table of Contents
-
-1. [Product Vision](#-product-vision)
-2. [High-Level Feature Set](#-high-level-feature-set)
-3. [Domain Model & Bounded Contexts](#-domain-model--bounded-contexts)
-4. [Solution Architecture](#-solution-architecture)
-5. [Mapping Book Concepts to This Project](#-mapping-book-concepts-to-this-project)
-6. [Implementation Roadmap (Phased Plan)](#-implementation-roadmap-phased-plan)
-7. [Next Steps](#-next-steps-checklist)
+**Portfolio**: [www.dotnetdeveloper.co.uk](https://www.dotnetdeveloper.co.uk)
 
 ---
 
-## 🎯 Product Vision
+## ✨ Key Features
 
-**CricketClub** is a serious platform for a mid–large amateur cricket club. It is not a toy.  
+### Core Functionality
+- ✅ **Team Management**: Create and manage multiple cricket teams (1st XI, 2nd XI, Youth, Veterans, Women's)
+- ✅ **Member Profiles**: Comprehensive player information with statistics, roles, and availability tracking
+- ✅ **Season Management**: Organize fixtures and matches by cricket seasons
+- ✅ **Match Fixtures**: Schedule matches with venue, opponent, and competition details
+- ✅ **Digital Scorecards**: Record detailed batting scores and bowling figures
+- ✅ **Player Statistics**: Automatic calculation of batting averages, strike rates, bowling economy
+- ✅ **Match Results**: Track wins, losses, player of the match awards
 
-The platform will support:
+### Security & Authentication
+- 🔐 **JWT-based Authentication**: Secure token-based authentication system
+- 🔐 **Role-Based Authorization**: Admin, Captain, and Player roles with granular permissions
+- 🔐 **Password Security**: ASP.NET Core Identity with configurable password policies
+- 🔐 **Account Lockout**: Brute-force attack prevention with automatic lockout
+- 🔐 **Permission System**: Fine-grained access control (Players:View, Teams:Edit, Admin:ManageUsers, etc.)
 
-- Multiple teams (1st XI, 2nd XI, juniors, etc.).
-- League, cup, and friendly fixtures across seasons.
-- Membership, payments, and roles (player, captain, coach, committee).
-- Match scoring and rich statistics.
-- Admin & public-facing portals.
-- Minimal APIs for future mobile or external integrations.
-
-### Key Actor Personas
-
-1. **Public Visitors / Supporters**
-   - Browse fixtures and results.
-   - See news and announcements.
-   - View public player stats and team info.
-
-2. **Club Members / Players**
-   - Manage personal profile.
-   - Declare match availability.
-   - See team selections and match info.
-   - View personal statistics and membership status.
-
-3. **Captains / Coaches**
-   - Create squads and playing XIs.
-   - Manage player availability and selection.
-   - Enter match results / ball-by-ball scoring.
-   - Analyze player performance.
-
-4. **Club Committee / Admins**
-   - Configure seasons, competitions, and teams.
-   - Manage memberships, roles, and approvals.
-   - Handle fees/payments (even if payment gateway is mocked initially).
-   - Publish news & announcements.
-
-5. **External Consumers (Future)**
-   - Mobile apps and third-party systems via **Minimal APIs**.
+### Data Management
+- 📊 **Seed Data System**: Automatic database seeding with realistic test data (175+ records)
+- 📊 **Soft Deletes**: Non-destructive data removal with audit trails
+- 📊 **Data Validation**: Comprehensive validation using FluentValidation
+- 📊 **Efficient Queries**: Optimized EF Core queries with eager loading and projections
 
 ---
 
-## 🧩 High-Level Feature Set
+## 🏗️ Architecture & Technology Stack
 
-### 1. Public Website
+### Architecture Pattern
+**Clean Architecture** (Onion Architecture) with clear separation of concerns:
 
-- Home page, news, and announcements.
-- Teams pages (squads, captains, coaches).
-- Fixtures & results (filterable by team, competition, date).
-- Player profile pages (public view).
-- Basic statistics: top run scorers, wicket takers, etc.
-- Contact form / enquiries.
+```
+┌─────────────────────────────────────────┐
+│           Presentation Layer            │
+│  (FaziCricketClub.API + IdentityApi)   │
+└─────────────────┬───────────────────────┘
+                  │
+┌─────────────────▼───────────────────────┐
+│         Application Layer               │
+│    (Business Logic + Use Cases)         │
+│    - DTOs, Mapping, Validation          │
+└─────────────────┬───────────────────────┘
+                  │
+┌─────────────────▼───────────────────────┐
+│       Infrastructure Layer              │
+│   (EF Core + Repositories + Identity)   │
+│    - Data Access, External Services     │
+└─────────────────┬───────────────────────┘
+                  │
+┌─────────────────▼───────────────────────┐
+│           Domain Layer                  │
+│       (Entities + Interfaces)           │
+│    - Pure business logic, no dependencies│
+└─────────────────────────────────────────┘
+```
 
-### 2. Member Portal
+### Technology Stack
 
-- Registration, login, and secure profile management.
-- Match availability per fixture.
-- Notifications (selection, schedule changes).
-- Membership status & payment history.
-- Training & nets information.
+#### Backend Framework
+- **.NET 10.0** - Latest .NET framework for high-performance APIs
+- **C# 14.0** - Modern C# with latest language features
+- **ASP.NET Core Web API** - RESTful API development
+- **Entity Framework Core 10.0** - Advanced ORM for data access
+- **ASP.NET Core Identity** - Comprehensive user authentication and authorization
+- **SQL Server** - Enterprise-grade relational database
 
-### 3. Admin Portal
+#### Libraries & Packages
+- **AutoMapper 13.0.1** - Object-to-object mapping
+- **FluentValidation 12.1.1** - Fluent interface for validation rules
+- **Swashbuckle (Swagger) 7.2.0** - API documentation and testing UI
+- **Microsoft.AspNetCore.Authentication.JwtBearer 10.0.0** - JWT token validation
 
-- Season and competition management.
-- Team management (teams, captains, coaches).
-- Fixture scheduling and editing.
-- Member and roles management.
-- Membership categories & fees.
-- Content management (news, announcements).
-
-### 4. Scoring & Match Centre
-
-- Pre-match: playing XI selection, toss, bat/bowl decision.
-- Live scoring interface (overs, wickets, ball events).
-- Automatic batting and bowling scorecards.
-- Live scoreboard page for spectators.
-- Post-match summaries and reports.
-
-### 5. Statistics & Analytics
-
-- Player stats: averages, strike rates, economies, aggregates.
-- Team stats: win/loss records, scored/conceded runs, partnerships.
-- Season / career summaries.
-- Simple charts and visualizations (later via Blazor components).
-
-### 6. Facilities & Nets Booking
-
-- Facility definitions (grounds, nets, halls).
-- Booking slots & calendars.
-- Booking / cancellation rules and workflows.
-
-### 7. Shop & Payments (Advanced / Optional)
-
-- Simple club shop (shirts, caps, training gear).
-- Membership fee payments & invoices (mocked gateway initially).
-- Order history and basic reporting.
-
-### 8. API Surface
-
-- Public APIs for fixtures, results, and basic stats.
-- Authenticated APIs for member operations, bookings, etc.
-- Designed using **ASP.NET Core Minimal APIs**.
+#### Design Patterns & Practices
+- **Repository Pattern** - Data access abstraction
+- **Unit of Work Pattern** - Transaction management
+- **Dependency Injection** - Built-in IoC container
+- **SOLID Principles** - Applied throughout codebase
+- **Clean Code** - Readable, maintainable code structure
+- **Async/Await** - Non-blocking I/O operations
 
 ---
 
-## 🧠 Domain Model & Bounded Contexts
+## 📂 Project Structure
 
-We’ll use a pragmatic **bounded context** approach (DDD-inspired, not dogmatic).
-
-### 1. Membership Context
-
-**Core Entities:**
-
-- `Member`
-  - Id, FullName, Email, Phone, DateOfBirth, IsActive, JoinedDate, etc.
-- `MembershipType`
-  - Name, description, annual fee, age boundaries (if applicable).
-- `MembershipFee`
-  - Amount, due date, season.
-- `Payment`
-  - Amount, date, method, status.
-- `Role`
-  - Player, Captain, Coach, Admin, etc.
-
-**Responsibilities:**
-
-- Manage members & their roles.
-- Handle membership periods and payment status.
-- Support secure authentication and authorization.
-
----
-
-### 2. Cricket Operations Context
-
-**Core Entities:**
-
-- `Season`
-- `Competition` (League, Cup, Friendly)
-- `Team`
-- `SquadMembership` (Member belongs to a team)
-- `Fixture`
-  - SeasonId, CompetitionId, HomeTeamId, AwayTeamId, StartDateTime, Venue, Status.
-- `Match`
-  - FixtureId, TossWinnerTeamId, TossDecision, Format (T20, 40-overs, etc.), Status.
-- `Innings`
-  - MatchId, BattingTeamId, BowlingTeamId, OversPlanned, OversBowled, Runs, Wickets.
-- `BallEvent`
-  - InningsId, OverNumber, BallInOver, BowlerId, BatsmanId, RunsOffBat, Extras, WicketInfo.
-- `BattingInnings`, `BowlingFigure` (aggregated from `BallEvent`).
-
-**Responsibilities:**
-
-- Lifecycle of cricket matches.
-- Rich scorecard and statistics as derived data.
-
----
-
-### 3. Facilities & Bookings Context
-
-**Core Entities:**
-
-- `Facility` (ground, nets, hall)
-- `BookingSlot`
-- `Booking`
-
-**Responsibilities:**
-
-- Scheduling & availability of practice facilities.
-- Prevent double bookings and handle cancellations.
-
----
-
-### 4. Shop & Finance Context (Optional)
-
-**Core Entities:**
-
-- `Product`
-- `Order`
-- `OrderLine`
-- `Invoice`
-
-**Responsibilities:**
-
-- Basic club merchandise and membership fee transactions.
-- Links to payment infrastructure.
+```
+FazCricketClub/
+│
+├── FaziCricketClub.Domain/              # Domain entities and interfaces
+│   ├── Entities/                        # Core business entities
+│   │   ├── Team.cs
+│   │   ├── Member.cs
+│   │   ├── Season.cs
+│   │   ├── Fixture.cs
+│   │   ├── MatchResult.cs
+│   │   ├── BattingScore.cs
+│   │   └── BowlingFigure.cs
+│   └── Interfaces/                      # Repository abstractions
+│       ├── IRepository.cs
+│       ├── IUnitOfWork.cs
+│       └── I{Entity}Repository.cs
+│
+├── FaziCricketClub.Application/         # Business logic layer
+│   ├── DTOs/                           # Data Transfer Objects
+│   │   ├── TeamDto.cs
+│   │   ├── MemberDto.cs
+│   │   └── MatchResultDto.cs
+│   ├── Mapping/                        # AutoMapper profiles
+│   │   └── MappingProfile.cs
+│   ├── Services/                       # Business services
+│   │   └── Interfaces/
+│   └── Validation/                     # FluentValidation rules
+│       ├── CreateSeasonDtoValidator.cs
+│       └── CreateTeamDtoValidator.cs
+│
+├── FaziCricketClub.Infrastructure/      # Data access layer
+│   ├── Persistence/                    # EF Core DbContext
+│   │   ├── CricketClubDbContext.cs
+│   │   └── MainDatabaseSeeder.cs       # Seed data generator
+│   ├── Repositories/                   # Repository implementations
+│   │   ├── Repository.cs
+│   │   ├── UnitOfWork.cs
+│   │   └── {Entity}Repository.cs
+│   └── Migrations/                     # Database migrations
+│       └── 20251226_Initial_Migration.cs
+│
+├── FaziCricketClub.API/                # Main API application
+│   ├── Controllers/                    # API endpoints
+│   │   ├── TeamsController.cs
+│   │   ├── MembersController.cs
+│   │   ├── SeasonsController.cs
+│   │   ├── FixturesController.cs
+│   │   └── SeedController.cs          # Manual seed endpoint
+│   ├── Middleware/                     # Custom middleware
+│   │   ├── GlobalExceptionHandling.cs
+│   │   └── CorrelationIdMiddleware.cs
+│   ├── Configuration/                  # App configuration
+│   │   └── JwtSettings.cs
+│   └── Security/                       # Security helpers
+│       └── AppPermissions.cs
+│
+├── FaziCricketClub.IdentityApi/        # Authentication API
+│   ├── Controllers/                    # Auth endpoints
+│   │   ├── AuthController.cs          # Login/Register
+│   │   └── AdminController.cs         # User/Role management
+│   ├── Services/                       # JWT token service
+│   │   ├── ITokenService.cs
+│   │   └── JwtTokenService.cs
+│   ├── Infrastructure/                 # Identity setup
+│   │   ├── IdentityDataSeeder.cs      # Roles & permissions
+│   │   └── UserSeeder.cs              # Test users
+│   ├── Entities/                       # Identity entities
+│   │   ├── ApplicationUser.cs
+│   │   └── ApplicationRole.cs
+│   └── Data/                          # Identity DbContext
+│       └── CricketClubIdentityDbContext.cs
+│
+└── FaziCricketClub.Tests.Unit/         # Unit tests
+    └── Services/                       # Service tests
+```
 
 ---
 
-### 5. Content & Communication Context
+## 🚀 Getting Started
 
-**Core Entities:**
+### Prerequisites
 
-- `NewsItem`
-- `Announcement`
-- `MediaItem` (photos, possibly video links)
-- `ContactMessage`
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
+- [SQL Server 2019+](https://www.microsoft.com/sql-server) or SQL Server Express
+- [Visual Studio 2022](https://visualstudio.microsoft.com/) (17.13+) or [VS Code](https://code.visualstudio.com/)
+- [Git](https://git-scm.com/)
 
-**Responsibilities:**
+### Installation Steps
 
-- Public and internal communications.
-- Handling contact form submissions.
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/FazCricketClub.git
+cd FazCricketClub
+```
 
----
+#### 2. Configure Database Connection Strings
 
-### 6. Analytics Context
+Update `appsettings.json` in both API projects:
 
-**Core Entities (mostly read models):**
+**FaziCricketClub.API/appsettings.json**:
+```json
+{
+  "ConnectionStrings": {
+    "CricketClubDatabase": "Server=localhost;Database=FaziCricketClubDB;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
+```
 
-- `PlayerStats`
-- `TeamStats`
-- `SeasonStats`
+**FaziCricketClub.IdentityApi/appsettings.json**:
+```json
+{
+  "ConnectionStrings": {
+    "IdentityConnection": "Server=localhost;Database=FaziCricketClubIdentityDB;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
+```
 
-**Responsibilities:**
+#### 3. Configure JWT Settings
 
-- Aggregated, query-friendly views built from underlying contexts.
-- Used for dashboards, leaderboards, and performance insights.
+⚠️ **IMPORTANT**: Use the **same JWT Key** in both `appsettings.json` files:
 
----
+```json
+{
+  "Jwt": {
+    "Key": "your-super-secret-key-at-least-32-characters-long-for-security",
+    "Issuer": "FaziCricketClub",
+    "Audience": "FaziCricketClubUsers",
+    "ExpiresInMinutes": 60
+  }
+}
+```
 
-## 🏗 Solution Architecture
+#### 4. Apply Database Migrations
 
-We’ll follow a Clean Architecture-ish layout with multiple projects.
+**Using Package Manager Console (Visual Studio)**:
+```powershell
+# Select FaziCricketClub.API as startup project
+Update-Database
 
-### Project Structure (Initial Plan)
+# Select FaziCricketClub.IdentityApi as startup project
+Update-Database
+```
 
-- `CricketClub.Domain`
-  - Entities, value objects, domain rules.
-  - No external dependencies like EF or ASP.NET.
-  - Heavy use of modern C# patterns (records, pattern matching, etc.).
+**Using .NET CLI**:
+```bash
+# Main Database
+cd FaziCricketClub.API
+dotnet ef database update
 
-- `CricketClub.Application`
-  - Use cases (commands, queries).
-  - Interfaces for repositories/services (e.g., `IMemberRepository`, `IMatchService`).
-  - DTOs and validation components.
-  - LINQ-heavy logic and shared types like `Result<T>`.
+# Identity Database
+cd ../FaziCricketClub.IdentityApi
+dotnet ef database update
+```
 
-- `CricketClub.Infrastructure`
-  - EF Core DbContext & configurations.
-  - Migrations, seeding scripts.
-  - External services (email, payment gateway, file storage).
-  - Implementation of repository interfaces.
+#### 5. Run the Application
 
-- `CricketClub.WebApi`
-  - ASP.NET Core **Minimal APIs**.
-  - Public and internal endpoints.
-  - Configuration, logging, ProblemDetails, validation.
-  - OpenAPI/Swagger integration.
+**Option A: Visual Studio**
+1. Right-click on Solution → **Properties**
+2. Select **Multiple startup projects**
+3. Set both `FaziCricketClub.API` and `FaziCricketClub.IdentityApi` to **Start**
+4. Press **F5** to run
 
-- `CricketClub.Web`
-  - **Blazor Web App (Unified Model)**:
-    - Public site pages (SSR).
-    - Member portal (interactive).
-    - Admin portal.
-  - Uses HttpClient for WebAssembly scenarios and DI for server-side components.
+**Option B: Command Line**
+```bash
+# Terminal 1 - Identity API
+cd FaziCricketClub.IdentityApi
+dotnet run
 
-- `CricketClub.Jobs`
-  - Console / worker service.
-  - Background tasks (stat recalculation, reminders, data exports).
-  - Target for trimming & Native AOT experiments.
+# Terminal 2 - Main API
+cd FaziCricketClub.API
+dotnet run
+```
 
-- `CricketClub.Shared` (optional, but recommended)
-  - Shared contracts (DTOs) and utilities.
-  - May be packaged as an internal NuGet to practice packaging & reuse.
+#### 6. Access Swagger UI
 
-- Tests:
-  - `CricketClub.Tests.Unit`
-  - `CricketClub.Tests.Integration`
-  - `CricketClub.Tests.Api` (Minimal API integration tests)
-  - Potentially `CricketClub.Tests.Blazor` (for component tests later).
-
----
-
-## 🔗 Mapping Book Concepts to This Project
-
-This project is designed to **exercise** the concepts from *C# 14 & .NET 10*.
-
-### C# Language & BCL
-
-- **Records & Value Objects** for read models and DTOs.
-- **Pattern Matching** for domain logic (e.g., match status transitions).
-- **Nullable Reference Types** enforced across the solution.
-- **Tuples & Local Functions** in complex operations where appropriate.
-- **Generics & Constraints** for `Result<T>`, repositories, caching, and other utilities.
-
-### Collections & LINQ
-
-- LINQ-heavy queries for:
-  - Player stats (aggregations: averages, totals, best figures).
-  - Team stats (win/loss, runs scored/conceded).
-  - Fixtures (filter by date, team, competition).
-- Use of newer LINQ methods (`DistinctBy`, `CountBy`, etc.) where suitable.
-
-### Exceptions & Error Handling
-
-- Guard clauses for key operations and input validation.
-- Domain-specific error handling unified via `Result<T>` or similar pattern.
-- Mapping exceptions and failures to `ProblemDetails` in Minimal APIs.
-
-### Files & Streams
-
-- Export match scorecards and stats to CSV/Excel-like formats.
-- Upload and serve profile/team images.
-- Optionally: serialize config snapshots to JSON at startup/shutdown.
-
-### JSON & XML Serialization
-
-- `System.Text.Json` as default for APIs & Blazor.
-- Optional XML export/import endpoints (e.g., fixtures schedule interchange).
-
-### EF Core & Data
-
-- Rich relational modeling for cricket entities.
-- Migrations and seeding for initial data (teams, test fixtures).
-- Eager vs lazy loading, projections to DTOs, `ToQueryString()` for query inspection.
-
-### ASP.NET Core / Minimal APIs
-
-- Clean Minimal API endpoint definitions for all major entities.
-- Route constraints (`int`, `guid`, `regex`, etc.).
-- Short-circuit endpoints for simple paths and health checks.
-- Validation integration (including new Minimal API validation features).
-
-### Blazor
-
-- Component-based UI for lists & detail pages (fixtures, players, results).
-- `EditForm` with DataAnnotations & `ValidationMessage`s for robust forms.
-- `EventCallback` to build reusable form components.
-- Streaming rendering for heavy stats pages.
-
-### HttpClient & HttpClientFactory
-
-- Typed HttpClients for calling `CricketClub.WebApi` from Blazor WebAssembly.
-- Correct lifecycle management via HttpClientFactory.
-
-### Packaging & NuGet
-
-- `Directory.Packages.props` for Central Package Management.
-- Optional internal NuGet package(s) via `CricketClub.Shared`.
-
-### Trimming & Native AOT
-
-- Publish `CricketClub.Jobs` as self-contained, trimmed, and optionally AOT-native.
-- Handle reflection-heavy parts carefully (e.g., EF Core or serializers).
+- **Identity API**: https://localhost:7001/swagger
+- **Main API**: https://localhost:7000/swagger
 
 ---
 
-## 🗺 Implementation Roadmap (Phased Plan)
+## 🎮 Usage Guide
 
-> **Note:** This is a roadmap for future work. At this stage, **no code is written**.
+### 1. Authentication Flow
 
-### Phase 1 – Foundation & Skeleton
+#### Step 1: Login to Get JWT Token
 
-**Goal:** Establish solution structure and core domain baseline.
+**Endpoint**: `POST https://localhost:7001/api/auth/login`
 
-- Create solution & projects as outlined in [Solution Architecture](#-solution-architecture).
-- Set up `Directory.Packages.props` for central package management.
-- Define minimal core domain entities:
-  - `Member`, `Team`, `Season`, `Fixture` (basic shapes).
-- Configure EF Core DbContext and first migrations.
-- Add a basic Minimal API endpoint (e.g., `/health`).
-- Concepts:
-  - Project structuring, DI, EF basics, central package mgmt.
+**Request Body**:
+```json
+{
+  "email": "admin@fazcricket.com",
+  "password": "Admin@123"
+}
+```
+
+**Response**:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBmYXpjcmlja2V0LmNvbSIsIm5hbWUiOiJhZG1pbiIsInJvbGUiOiJBZG1pbiIsIm5iZiI6MTczNTE0MDAwMCwiZXhwIjoxNzM1MTQzNjAwLCJpYXQiOjE3MzUxNDAwMDB9.abcdef123456...",
+  "expiresAt": "2025-12-27T10:30:00Z",
+  "user": {
+    "id": "guid-here",
+    "email": "admin@fazcricket.com",
+    "userName": "admin",
+    "roles": ["Admin"]
+  }
+}
+```
+
+#### Step 2: Authorize in Swagger
+
+1. Copy the `token` value from the login response
+2. Click the **🔒 Authorize** button (top right in Swagger UI)
+3. Enter: `Bearer {paste-your-token-here}`
+4. Click **Authorize** → **Close**
+
+Now all API requests will include your JWT token automatically!
+
+### 2. Test Users (Development Mode)
+
+The system automatically seeds test users on first run in Development environment:
+
+| Role    | Email                     | Password      | Permissions                          |
+|---------|---------------------------|---------------|--------------------------------------|
+| Admin   | admin@fazcricket.com      | Admin@123     | Full system access                   |
+| Captain | captain@fazcricket.com    | Captain@123   | Team & match management              |
+| Player  | player@fazcricket.com     | Player@123    | View fixtures, update availability   |
+
+### 3. Sample API Operations
+
+#### Get All Teams
+```http
+GET https://localhost:7000/api/teams
+Authorization: Bearer {your-token}
+```
+
+**Response**:
+```json
+[
+  {
+    "id": 1,
+    "name": "1st XI",
+    "description": "First team squad",
+    "isActive": true
+  },
+  {
+    "id": 2,
+    "name": "2nd XI",
+    "description": "Second team squad",
+    "isActive": true
+  }
+]
+```
+
+#### Create a New Season
+```http
+POST https://localhost:7000/api/seasons
+Authorization: Bearer {your-token}
+Content-Type: application/json
+
+{
+  "name": "Summer 2025",
+  "startDate": "2025-04-01",
+  "endDate": "2025-09-30",
+  "isActive": true
+}
+```
+
+#### Get Match Fixtures
+```http
+GET https://localhost:7000/api/fixtures?seasonId=1
+Authorization: Bearer {your-token}
+```
+
+#### Record Match Result with Scorecard
+```http
+POST https://localhost:7000/api/matchresults
+Authorization: Bearer {your-token}
+Content-Type: application/json
+
+{
+  "fixtureId": 5,
+  "homeTeamRuns": 245,
+  "homeTeamWickets": 8,
+  "homeTeamOvers": 50.0,
+  "awayTeamRuns": 220,
+  "awayTeamWickets": 10,
+  "awayTeamOvers": 48.3,
+  "winningTeamId": 1,
+  "resultSummary": "Won by 25 runs",
+  "playerOfTheMatchMemberId": 5,
+  "notes": "Excellent bowling performance by Smith"
+}
+```
 
 ---
 
-### Phase 2 – Membership & Authentication
+## 📊 Seed Data
 
-**Goal:** Implement full membership lifecycle and auth.
+### Automatic Seeding (Development Mode Only)
 
-- Flesh out Membership context (`Member`, `MembershipType`, `Payment`).
-- Integrate ASP.NET Core Identity or custom JWT auth.
-- Implement Minimal APIs:
-  - `POST /members/register`
-  - `POST /auth/login`
-  - `GET /members/me`
-- Create Blazor pages for register & login using `EditForm` & validation.
-- Concepts:
-  - Auth & identity, validation, Blazor forms, HttpClient from Blazor to API.
+On first startup in Development environment, the system automatically populates:
 
----
+#### Identity Database
+- ✅ **3 Roles** with comprehensive permissions:
+  - Admin (all permissions)
+  - Captain (team and match management)
+  - Player (view and availability)
 
-### Phase 3 – Teams, Seasons & Fixtures
+- ✅ **3 Test Users** ready for testing
 
-**Goal:** Admin & public handling of fixtures.
+#### Main Database
+- ✅ **5 Teams**:
+  - 1st XI (Senior team)
+  - 2nd XI (Secondary team)
+  - U19 Team (Youth development)
+  - Veterans XI (Senior players)
+  - Women's Team
 
-- Implement domain entities: `Team`, `Season`, `Competition`, `Fixture`.
-- Admin Blazor pages to manage seasons, competitions, fixtures.
-- Public pages to browse fixtures and details.
-- LINQ queries for upcoming fixtures, by team, by competition.
-- Concepts:
-  - EF relationships, LINQ sorting/filtering, Blazor lists/details, Minimal API design.
+- ✅ **20 Members** with realistic:
+  - Names (first + last)
+  - Ages (18-45)
+  - Positions (batsman, bowler, all-rounder, wicket-keeper)
+  - Join dates (2022-2025)
+  - Active status (80% active, 20% inactive)
 
----
+- ✅ **3 Seasons**:
+  - Summer 2024 (Apr 1 - Sep 30, Active)
+  - Winter 2024 (Oct 1 - Mar 31, Scheduled)
+  - Summer 2023 (Apr 1 - Sep 30, Completed)
 
-### Phase 4 – Match Scoring & Stats Engine
+- ✅ **13 Fixtures** across teams and seasons:
+  - 9 Completed matches (60%)
+  - 4 Scheduled matches (30%)
+  - Various venues and competitions
 
-**Goal:** Core cricket engine & statistics.
+- ✅ **8 Match Results** with complete scorecards:
+  - **176 Batting Scores** with realistic distributions:
+    - Top scorer: 50-80 runs
+    - Middle order: 10-40 runs
+    - Tail enders: 0-15 runs
+    - Proportional balls faced, 4s, 6s
 
-- Implement `Match`, `Innings`, `BallEvent`, `BattingInnings`, `BowlingFigure`.
-- Build Blazor scoring UI for live matches.
-- Implement background jobs in `CricketClub.Jobs`:
-  - Recalculate stats periodically.
-- Build stats endpoints & Blazor pages for top scorers, best bowlers, etc.
-- Concepts:
-  - Complex domain modeling, advanced querying, background processing, streaming rendering (optional).
+  - **72 Bowling Figures** with realistic economy:
+    - Best bowler: 2-4 wickets
+    - Support bowlers: 0-2 wickets
+    - Economy rates: 4-8 runs per over
 
----
+  - Player of the match awards
 
-### Phase 5 – Member Portal & Availability
+### Manual Seeding via API
 
-**Goal:** Player-facing workflows.
+**Seed Data** (or reseed without clearing):
+```http
+POST https://localhost:7000/api/seed/data?clearExisting=false
+```
 
-- Implement availability declarations per fixture.
-- Captains’ screens to view availability & select playing XIs.
-- Notifications for selection / changes (email or in-app).
-- Concepts:
-  - Business workflows, role-based UI, Blazor forms & state management.
+**Clear All Data**:
+```http
+DELETE https://localhost:7000/api/seed/data
+```
 
----
-
-### Phase 6 – Facilities & Nets Booking
-
-**Goal:** Facility scheduling.
-
-- Implement `Facility`, `BookingSlot`, `Booking`.
-- UI for calendars and booking flows.
-- Enforce booking rules (no double booking, cancellation windows).
-- Concepts:
-  - Time-based logic, validation, concurrency control in EF.
-
----
-
-### Phase 7 – Shop & Payments (Optional/Advanced)
-
-**Goal:** Add simple club e-commerce.
-
-- Implement `Product`, `Order`, `OrderLine`, `Invoice`.
-- Blazor UI for browsing products and managing a basket.
-- Integrate a mock or test payment gateway.
-- Concepts:
-  - External APIs, DTOs, error handling, financial workflows.
+⚠️ **Note**: Seed endpoints only work in Development environment for safety.
 
 ---
 
-### Phase 8 – Hardening, Observability & Performance
+## 🔐 Security Features
 
-**Goal:** Production-readiness & deployment.
+### Authentication & Authorization
 
-- Configure HTTP logging middleware.
-- Improve logging structure across services.
-- Finalize OpenAPI docs (summaries, descriptions, versioning).
-- Publish:
-  - `CricketClub.WebApi` & `CricketClub.Web` via Kestrel (container-friendly).
-  - `CricketClub.Jobs` as self-contained (trimmed and possibly AOT).
-- Concepts:
-  - Observability, OpenAPI, performance & deployment patterns.
+- **JWT Tokens**: Stateless, scalable authentication
+- **Token Lifetime**: Configurable (default: 60 minutes)
+- **HTTPS Only**: TLS/SSL encryption enforced
+- **Role-Based Access Control**: Three-tier role system
+- **Permission Claims**: Granular feature-level permissions
+  ```
+  Players:View, Players:Edit
+  Teams:View, Teams:Edit
+  Fixtures:View, Fixtures:Edit
+  Admin:ManageUsers, Admin:ManageRoles, Admin:ManagePermissions
+  ```
+
+### Password Security
+
+- **Minimum Requirements**:
+  - 8+ characters
+  - 1 uppercase letter
+  - 1 lowercase letter
+  - 1 digit
+- **BCrypt Hashing**: Industry-standard password hashing
+- **Account Lockout**: 5 failed attempts → 5-minute lockout
+- **Unique Email**: One account per email address
+
+### API Security
+
+- **Input Validation**: FluentValidation on all DTOs
+- **SQL Injection Protection**: EF Core parameterized queries
+- **XSS Protection**: Automatic output encoding
+- **CORS**: Configurable allowed origins
+- **Rate Limiting**: Ready for implementation
 
 ---
 
+## 📈 Performance Optimizations
 
+- **Async/Await**: Non-blocking I/O throughout
+- **Eager Loading**: Optimized `.Include()` for related data
+- **Projection**: Select only needed columns
+- **Connection Pooling**: Built-in ADO.NET pooling
+- **Query Caching**: EF Core compiled queries
+- **Soft Deletes**: Global query filters for performance
+
+---
+
+## 🧪 Testing
+
+### Run Unit Tests
+
+```bash
+cd FaziCricketClub.Tests.Unit
+dotnet test
+```
+
+### Test Coverage
+
+- ✅ Service layer unit tests
+- ✅ Repository pattern tests
+- ✅ Validation rule tests
+- ✅ AutoMapper configuration tests
+
+---
+
+## 📝 API Documentation
+
+Full interactive API documentation via Swagger UI:
+
+- **Identity API**: https://localhost:7001/swagger
+  - `/api/auth/register` - Register new user
+  - `/api/auth/login` - Authenticate user
+  - `/api/admin/users` - User management (Admin only)
+  - `/api/admin/roles` - Role management (Admin only)
+
+- **Main API**: https://localhost:7000/swagger
+  - `/api/teams` - Team CRUD operations
+  - `/api/members` - Member management
+  - `/api/seasons` - Season management
+  - `/api/fixtures` - Match fixture scheduling
+  - `/api/matchresults` - Scorecard entry
+  - `/api/seed/data` - Manual seed operations
+
+---
+
+## 🚧 Roadmap
+
+### Planned Features
+
+- [ ] Angular/React frontend application
+- [ ] Real-time match updates (SignalR)
+- [ ] Player performance analytics dashboard
+- [ ] Team selection AI recommendations
+- [ ] Mobile app (MAUI)
+- [ ] Email notifications
+- [ ] Payment integration
+- [ ] PDF scorecard export
+- [ ] Multi-language support
+- [ ] Dark mode UI
+
+---
+
+## 🛠️ Development Skills Demonstrated
+
+### Architecture & Design
+- ✅ Clean Architecture (Onion Architecture)
+- ✅ SOLID Principles
+- ✅ Repository Pattern
+- ✅ Unit of Work Pattern
+- ✅ Dependency Injection
+- ✅ Separation of Concerns
+
+### Backend Development
+- ✅ .NET 10.0 & C# 14.0
+- ✅ ASP.NET Core Web API
+- ✅ Entity Framework Core 10.0
+- ✅ LINQ & Lambda Expressions
+- ✅ Async/Await Patterns
+- ✅ FluentValidation
+- ✅ AutoMapper
+
+### Security
+- ✅ JWT Authentication
+- ✅ ASP.NET Core Identity
+- ✅ Role-Based Authorization
+- ✅ Claims-Based Permissions
+- ✅ Password Hashing (BCrypt)
+- ✅ HTTPS/TLS Enforcement
+
+### Database
+- ✅ SQL Server
+- ✅ EF Core Migrations
+- ✅ Complex Relationships
+- ✅ Soft Deletes
+- ✅ Query Optimization
+- ✅ Seed Data Generation
+
+### API Design
+- ✅ RESTful Principles
+- ✅ Swagger/OpenAPI
+- ✅ DTOs & Validation
+- ✅ Error Handling
+- ✅ API Versioning Ready
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+## 👨‍💻 About the Developer
+
+**Muhammad Afzal**
+*Senior .NET Developer | Full-Stack Engineer | Clean Code Advocate*
+
+Passionate about building scalable, maintainable enterprise applications using modern .NET technologies and industry best practices.
+
+### 🌐 Connect With Me
+
+- **Website**: [www.dotnetdeveloper.co.uk](https://www.dotnetdeveloper.co.uk)
+- **LinkedIn**: [linkedin.com/in/dotnetdeveloper20xx](https://linkedin.com/in/dotnetdeveloper20xx)
+- **Email**: [contact@dotnetdeveloper.co.uk](mailto:contact@dotnetdeveloper.co.uk)
+- **GitHub**: [github.com/dotnetdeveloper20xx](https://github.com/dotnetdeveloper20xx)
+- **Blog**: [blog.dotnetdeveloper.co.uk](https://blog.dotnetdeveloper.co.uk)
+
+### 💼 Hire Me
+
+Available for:
+- Full-stack .NET development
+- API design & architecture consultation
+- Code reviews & mentoring
+- Technical leadership
+- Contract/Freelance projects
+
+**Contact**: [contact@dotnetdeveloper.co.uk](mailto:contact@dotnetdeveloper.co.uk)
+
+---
+
+## 🙏 Acknowledgments
+
+- Microsoft for the excellent .NET ecosystem
+- ASP.NET Core team for the powerful framework
+- Entity Framework Core team for the ORM
+- The .NET community for inspiration and support
+
+---
+
+## 📞 Support
+
+Need help or have questions?
+
+1. 📧 **Email**: [contact@dotnetdeveloper.co.uk](mailto:contact@dotnetdeveloper.co.uk)
+2. 🐛 **Issues**: [GitHub Issues](https://github.com/dotnetdeveloper20xx/FazCricketClub/issues)
+3. 💬 **Discussion**: [GitHub Discussions](https://github.com/dotnetdeveloper20xx/FazCricketClub/discussions)
+
+---
+
+<div align="center">
+
+### ⭐ If you find this project useful, please give it a star! ⭐
+
+**Made with ❤️ and ☕ by [Faz Ahmed](https://www.dotnetdeveloper.co.uk)**
+
+*Showcasing modern .NET development practices*
+
+</div>

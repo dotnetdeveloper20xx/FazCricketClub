@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,7 +58,7 @@ builder.Services.AddDbContext<CricketClubIdentityDbContext>(options =>
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
-        // Password rules – adjust as needed for your security policy.
+        // Password rules ï¿½ adjust as needed for your security policy.
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
@@ -145,10 +146,48 @@ builder.Services.AddAuthorization(options =>
 // Register the JWT token service.
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
+// Register seeders.
+builder.Services.AddScoped<IdentityDataSeeder>();
+builder.Services.AddScoped<UserSeeder>();
+
 // Add controllers and Swagger.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FazCricketClub Identity API",
+        Version = "v1",
+        Description = "Cricket Club Authentication & Authorization API"
+    });
+
+    // Add JWT Authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and then your JWT token. Example: 'Bearer eyJhbGc...'"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -158,8 +197,16 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    // Seed roles and permissions (always run)
     var seeder = scope.ServiceProvider.GetRequiredService<IdentityDataSeeder>();
     await seeder.SeedAsync();
+
+    // Seed test users (only in Development)
+    if (app.Environment.IsDevelopment())
+    {
+        var userSeeder = scope.ServiceProvider.GetRequiredService<UserSeeder>();
+        await userSeeder.SeedTestUsersAsync();
+    }
 }
 
 

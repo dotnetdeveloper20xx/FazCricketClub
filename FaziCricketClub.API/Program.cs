@@ -7,6 +7,7 @@ using FaziCricketClub.Infrastructure;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,41 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FazCricketClub API",
+        Version = "v1",
+        Description = "Cricket Club Management System API"
+    });
+
+    // Add JWT Authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and then your JWT token. Example: 'Bearer eyJhbGc...'"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Automatically register all validators in the Application assembly
 builder.Services.AddValidatorsFromAssemblyContaining<CreateSeasonDtoValidator>();
@@ -127,7 +162,19 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// ------------------------------------------------------------
+// SEED MAIN DATABASE (DEVELOPMENT ONLY)
+// ------------------------------------------------------------
 
+using (var scope = app.Services.CreateScope())
+{
+    // Seed main database (only in Development)
+    if (app.Environment.IsDevelopment())
+    {
+        var mainSeeder = scope.ServiceProvider.GetRequiredService<FaziCricketClub.Infrastructure.Persistence.MainDatabaseSeeder>();
+        await mainSeeder.SeedAllAsync(clearExisting: false); // Only seed if data doesn't exist
+    }
+}
 
 // Global exception handling should be one of the first middlewares
 app.UseCorrelationId();
