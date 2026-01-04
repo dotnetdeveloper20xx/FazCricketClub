@@ -780,3 +780,66 @@ a {
     }
   }
 }
+
+// =====================================================
+// Notification Snackbar Styles
+// =====================================================
+.notification-success {
+  --mdc-snackbar-container-color: #22c55e !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    color: white !important;
+  }
+}
+
+.notification-error {
+  --mdc-snackbar-container-color: #ef4444 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    color: white !important;
+  }
+}
+
+.notification-warning {
+  --mdc-snackbar-container-color: #f59e0b !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    color: white !important;
+  }
+}
+
+.notification-info {
+  --mdc-snackbar-container-color: #3b82f6 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    color: white !important;
+  }
+}
+
+// =====================================================
+// Focus Visible for Accessibility
+// =====================================================
+*:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 2px;
+}
+
+// Remove default focus styles for mouse users
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Enhanced focus styles for interactive elements
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(46, 184, 46, 0.2);
+}

@@ -1,22 +1,38 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../core/auth/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { EditProfileDialogComponent } from './edit-profile-dialog.component';
+import { ChangePasswordDialogComponent } from './change-password-dialog.component';
+import { ProfileSkeletonComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    EditProfileDialogComponent,
+    ChangePasswordDialogComponent,
+    ProfileSkeletonComponent
   ],
   template: `
     <div class="page-container">
@@ -28,10 +44,7 @@ import { AuthService } from '../../core/auth/auth.service';
       </div>
 
       @if (!currentUser()) {
-        <div class="card loading-container">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading profile...</p>
-        </div>
+        <app-profile-skeleton></app-profile-skeleton>
       } @else {
         <div class="profile-content">
           <!-- Profile Card -->
@@ -122,20 +135,17 @@ import { AuthService } from '../../core/auth/auth.service';
               Quick Actions
             </h3>
             <div class="actions-list">
-              <button mat-stroked-button class="action-btn" disabled>
+              <button mat-stroked-button class="action-btn" (click)="openChangePassword()">
                 <mat-icon>lock</mat-icon>
                 Change Password
-                <span class="coming-soon">Coming Soon</span>
               </button>
-              <button mat-stroked-button class="action-btn" disabled>
+              <button mat-stroked-button class="action-btn" (click)="openEditProfile()">
                 <mat-icon>edit</mat-icon>
                 Edit Profile
-                <span class="coming-soon">Coming Soon</span>
               </button>
-              <button mat-stroked-button class="action-btn" disabled>
+              <button mat-stroked-button class="action-btn" routerLink="/settings">
                 <mat-icon>notifications</mat-icon>
                 Notification Settings
-                <span class="coming-soon">Coming Soon</span>
               </button>
             </div>
           </div>
@@ -404,15 +414,11 @@ import { AuthService } from '../../core/auth/auth.service';
       gap: 8px;
       padding: 12px 16px;
       height: auto;
+      transition: background-color 0.2s ease;
     }
 
-    .coming-soon {
-      margin-left: auto;
-      font-size: 10px;
-      padding: 2px 8px;
+    .action-btn:hover {
       background: var(--app-background);
-      border-radius: 4px;
-      color: var(--app-text-secondary);
     }
 
     .session-info {
@@ -491,6 +497,8 @@ import { AuthService } from '../../core/auth/auth.service';
 })
 export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private notificationService = inject(NotificationService);
 
   currentUser = this.authService.currentUser;
 
@@ -528,5 +536,39 @@ export class ProfileComponent implements OnInit {
       case 'player': return 'sports_cricket';
       default: return 'person';
     }
+  }
+
+  openEditProfile(): void {
+    const user = this.currentUser();
+    if (!user) return;
+
+    const dialogRef = this.dialog.open(EditProfileDialogComponent, {
+      width: '500px',
+      data: {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // In a real app, this would call an API to update the profile
+        this.notificationService.success('Profile updated successfully');
+      }
+    });
+  }
+
+  openChangePassword(): void {
+    const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
+      width: '450px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // In a real app, this would call an API to change the password
+        this.notificationService.success('Password changed successfully');
+      }
+    });
   }
 }

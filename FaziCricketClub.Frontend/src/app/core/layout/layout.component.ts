@@ -44,11 +44,16 @@ interface NavItem {
     MatProgressSpinnerModule
   ],
   template: `
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <div class="app-layout">
       <!-- Header -->
-      <header class="app-header">
+      <header class="app-header" role="banner">
         <div class="header-left">
-          <button mat-icon-button (click)="toggleSidebar()" class="menu-toggle">
+          <button mat-icon-button
+                  (click)="toggleSidebar()"
+                  class="menu-toggle"
+                  [attr.aria-label]="sidebarExpanded() ? 'Collapse sidebar' : 'Expand sidebar'"
+                  [attr.aria-expanded]="sidebarExpanded()">
             <mat-icon>{{ sidebarExpanded() ? 'menu_open' : 'menu' }}</mat-icon>
           </button>
           <div class="brand">
@@ -63,8 +68,8 @@ interface NavItem {
         </div>
 
         <div class="header-center">
-          <div class="search-box" #searchContainer>
-            <mat-icon class="search-icon">search</mat-icon>
+          <div class="search-box" #searchContainer role="search">
+            <mat-icon class="search-icon" aria-hidden="true">search</mat-icon>
             <input type="text"
                    placeholder="Search members, matches, teams..."
                    class="search-input"
@@ -72,12 +77,16 @@ interface NavItem {
                    (input)="onSearchInput()"
                    (focus)="showSearchResults = true"
                    (keydown.escape)="closeSearch()"
-                   (keydown.enter)="navigateToFirstResult()" />
+                   (keydown.enter)="navigateToFirstResult()"
+                   aria-label="Search members, matches, teams"
+                   aria-autocomplete="list"
+                   [attr.aria-expanded]="showSearchResults"
+                   aria-controls="search-results" />
             @if (isSearching()) {
               <mat-spinner diameter="20" class="search-spinner"></mat-spinner>
             }
             @if (showSearchResults && (searchResults().length > 0 || searchQuery.length >= 2)) {
-              <div class="search-results">
+              <div class="search-results" id="search-results" role="listbox" aria-label="Search results">
                 @if (searchResults().length === 0 && searchQuery.length >= 2) {
                   <div class="search-empty">
                     <mat-icon>search_off</mat-icon>
@@ -103,27 +112,28 @@ interface NavItem {
         <div class="header-right">
           <button mat-icon-button
                   [matTooltip]="themeService.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                  [attr.aria-label]="themeService.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
                   class="header-icon-btn theme-toggle"
                   (click)="themeService.toggleTheme()">
-            <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <mat-icon aria-hidden="true">{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
           </button>
 
-          <button mat-icon-button matTooltip="Notifications" class="header-icon-btn">
-            <mat-icon>notifications</mat-icon>
-            <span class="notification-badge">3</span>
+          <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" class="header-icon-btn">
+            <mat-icon aria-hidden="true">notifications</mat-icon>
+            <span class="notification-badge" aria-label="3 unread notifications">3</span>
           </button>
 
-          <button mat-icon-button matTooltip="Messages" class="header-icon-btn">
-            <mat-icon>mail</mat-icon>
+          <button mat-icon-button matTooltip="Messages" aria-label="Messages" class="header-icon-btn">
+            <mat-icon aria-hidden="true">mail</mat-icon>
           </button>
 
           <div class="user-menu">
-            <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
-              <div class="user-avatar">
+            <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn" aria-label="User menu">
+              <div class="user-avatar" aria-hidden="true">
                 <span class="avatar-initials">{{ userInitials() }}</span>
               </div>
               <span class="user-name">{{ displayName() }}</span>
-              <mat-icon class="dropdown-icon">expand_more</mat-icon>
+              <mat-icon class="dropdown-icon" aria-hidden="true">expand_more</mat-icon>
             </button>
             <mat-menu #userMenu="matMenu" class="user-dropdown">
               <div class="user-info-header">
@@ -158,8 +168,8 @@ interface NavItem {
       <!-- Main Container -->
       <div class="app-container">
         <!-- Sidebar -->
-        <aside class="app-sidebar" [class.expanded]="sidebarExpanded()" [class.collapsed]="!sidebarExpanded()">
-          <nav class="sidebar-nav">
+        <aside class="app-sidebar" [class.expanded]="sidebarExpanded()" [class.collapsed]="!sidebarExpanded()" role="complementary" aria-label="Sidebar navigation">
+          <nav class="sidebar-nav" aria-label="Main navigation">
             <div class="nav-section">
               <span class="nav-section-title" *ngIf="sidebarExpanded()">Main</span>
               @for (item of mainNavItems; track item.route) {
@@ -215,7 +225,7 @@ interface NavItem {
         </aside>
 
         <!-- Main Content -->
-        <main class="app-main" [class.sidebar-expanded]="sidebarExpanded()">
+        <main id="main-content" class="app-main" [class.sidebar-expanded]="sidebarExpanded()" role="main" aria-label="Main content">
           <div class="main-content">
             <router-outlet></router-outlet>
           </div>
@@ -224,6 +234,27 @@ interface NavItem {
     </div>
   `,
   styles: [`
+    /* Skip to content link for accessibility */
+    .skip-to-content {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--app-primary);
+      color: white;
+      padding: 8px 16px;
+      z-index: 10000;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 0 0 4px 0;
+      transition: top 0.2s ease;
+    }
+
+    .skip-to-content:focus {
+      top: 0;
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
     .app-layout {
       display: flex;
       flex-direction: column;

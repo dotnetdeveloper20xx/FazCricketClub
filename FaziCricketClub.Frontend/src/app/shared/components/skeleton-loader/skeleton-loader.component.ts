@@ -388,3 +388,285 @@ export class TableSkeletonComponent {
     return Array(this.rowCount).fill(0);
   }
 }
+
+// Detail Page Skeleton Component
+@Component({
+  selector: 'app-detail-skeleton',
+  standalone: true,
+  imports: [CommonModule, SkeletonLoaderComponent],
+  template: `
+    <div class="detail-skeleton">
+      <!-- Header Section -->
+      <div class="detail-header-skeleton">
+        <div class="header-avatar">
+          <app-skeleton type="circle" width="100px"></app-skeleton>
+        </div>
+        <div class="header-info">
+          <app-skeleton type="text" width="250px" height="28px"></app-skeleton>
+          <app-skeleton type="text" width="180px" height="16px"></app-skeleton>
+          <div class="header-badges">
+            <app-skeleton type="rect" width="80px" height="28px"></app-skeleton>
+            <app-skeleton type="rect" width="100px" height="28px"></app-skeleton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="detail-content-skeleton">
+        <!-- Main Card -->
+        <div class="detail-card-skeleton main">
+          <app-skeleton type="text" width="150px" height="20px"></app-skeleton>
+          <div class="detail-grid">
+            @for (i of [1,2,3,4]; track i) {
+              <div class="detail-item-skeleton">
+                <app-skeleton type="text" width="60px" height="12px"></app-skeleton>
+                <app-skeleton type="text" width="100%" height="16px"></app-skeleton>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Side Card -->
+        <div class="detail-card-skeleton side">
+          <app-skeleton type="text" width="120px" height="18px"></app-skeleton>
+          @for (i of [1,2,3]; track i) {
+            <div class="side-item-skeleton">
+              <app-skeleton type="rect" width="40px" height="40px"></app-skeleton>
+              <div class="side-text">
+                <app-skeleton type="text" width="80%"></app-skeleton>
+                <app-skeleton type="text" width="60%" height="12px"></app-skeleton>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .detail-skeleton {
+      padding: 24px;
+    }
+
+    .detail-header-skeleton {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 32px;
+      background: var(--app-surface, white);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    .detail-content-skeleton {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .detail-card-skeleton {
+      padding: 24px;
+      background: var(--app-surface, white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .detail-card-skeleton.main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      background: var(--app-background, #f5f5f5);
+      border-radius: 8px;
+    }
+
+    .detail-card-skeleton.side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: fit-content;
+    }
+
+    .side-item-skeleton {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--app-background, #f5f5f5);
+      border-radius: 8px;
+    }
+
+    .side-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @media (max-width: 1024px) {
+      .detail-content-skeleton {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .detail-header-skeleton {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  `]
+})
+export class DetailSkeletonComponent {}
+
+// Profile Skeleton Component
+@Component({
+  selector: 'app-profile-skeleton',
+  standalone: true,
+  imports: [CommonModule, SkeletonLoaderComponent],
+  template: `
+    <div class="profile-skeleton">
+      <!-- Profile Header -->
+      <div class="profile-header-skeleton">
+        <app-skeleton type="circle" width="100px"></app-skeleton>
+        <div class="profile-header-text">
+          <app-skeleton type="text" width="200px" height="28px"></app-skeleton>
+          <app-skeleton type="text" width="180px" height="16px"></app-skeleton>
+        </div>
+      </div>
+
+      <!-- Profile Content -->
+      <div class="profile-content-skeleton">
+        <div class="profile-main-skeleton">
+          <div class="section-skeleton">
+            <div class="section-title-skeleton">
+              <app-skeleton type="rect" width="24px" height="24px"></app-skeleton>
+              <app-skeleton type="text" width="150px" height="18px"></app-skeleton>
+            </div>
+            <div class="detail-grid-skeleton">
+              @for (i of [1,2,3,4]; track i) {
+                <div class="detail-item-skeleton">
+                  <app-skeleton type="text" width="60px" height="10px"></app-skeleton>
+                  <app-skeleton type="text" width="100%"></app-skeleton>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-side-skeleton">
+          <app-skeleton type="text" width="120px" height="16px"></app-skeleton>
+          @for (i of [1,2,3]; track i) {
+            <app-skeleton type="rect" width="100%" height="48px"></app-skeleton>
+          }
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .profile-skeleton {
+      padding: 24px;
+    }
+
+    .profile-header-skeleton {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 32px;
+      background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .profile-header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .profile-content-skeleton {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .profile-main-skeleton {
+      background: var(--app-surface, white);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-title-skeleton {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .detail-grid-skeleton {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      background: var(--app-background, #f5f5f5);
+      border-radius: 8px;
+    }
+
+    .profile-side-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--app-surface, white);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      height: fit-content;
+    }
+
+    @media (max-width: 1024px) {
+      .profile-content-skeleton {
+        grid-template-columns: 1fr;
+      }
+    }
+  `]
+})
+export class ProfileSkeletonComponent {}
