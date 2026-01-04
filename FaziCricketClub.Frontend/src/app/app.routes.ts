@@ -56,6 +56,27 @@ export const routes: Routes = [
         loadComponent: () => import('./features/matches/matches-list.component').then(m => m.MatchesListComponent),
         title: 'Matches - FaziCricketClub'
       },
+      // Statistics routes
+      {
+        path: 'statistics',
+        children: [
+          {
+            path: 'leaderboards',
+            loadComponent: () => import('./features/statistics/leaderboards.component').then(m => m.LeaderboardsComponent),
+            title: 'Leaderboards - FaziCricketClub'
+          },
+          {
+            path: 'player/:id',
+            loadComponent: () => import('./features/statistics/player-stats.component').then(m => m.PlayerStatsComponent),
+            title: 'Player Statistics - FaziCricketClub'
+          },
+          {
+            path: '',
+            redirectTo: 'leaderboards',
+            pathMatch: 'full'
+          }
+        ]
+      },
       // Admin routes
       {
         path: 'admin',

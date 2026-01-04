@@ -610,8 +610,8 @@ export class LayoutComponent {
 
   mainNavItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-    { label: 'Calendar', icon: 'calendar_today', route: '/calendar' },
     { label: 'Matches', icon: 'sports_score', route: '/matches' },
+    { label: 'Leaderboards', icon: 'leaderboard', route: '/statistics/leaderboards' },
   ];
 
   managementNavItems: NavItem[] = [
