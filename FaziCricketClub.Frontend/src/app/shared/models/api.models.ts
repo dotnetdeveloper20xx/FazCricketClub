@@ -199,3 +199,38 @@ export interface MemberActivity {
   period: string;
   count: number;
 }
+
+// =====================================================
+// Admin Models (Identity API)
+// =====================================================
+
+export interface AdminUser {
+  id: string;
+  userName: string;
+  email: string;
+  isLockedOut: boolean;
+  roles: string[];
+}
+
+export interface AdminRole {
+  id: string;
+  name: string;
+  permissions: string[];
+}
+
+export interface Permission {
+  value: string;
+  description: string;
+}
+
+export interface AssignRoleRequest {
+  roleName: string;
+}
+
+export interface RolePermissionRequest {
+  permission: string;
+}
+
+export interface LockUserRequest {
+  minutes?: number;
+}
