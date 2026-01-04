@@ -16,7 +16,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MembersService } from '../../core/services/members.service';
 import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
+import { ExportService, ExportColumn } from '../../core/services/export.service';
 import { Member, PaginatedResponse } from '../../shared/models';
+import { TableSkeletonComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
 import { debounceTime, Subject } from 'rxjs';
 
 @Component({
@@ -38,7 +40,8 @@ import { debounceTime, Subject } from 'rxjs';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatChipsModule,
-    MatMenuModule
+    MatMenuModule,
+    TableSkeletonComponent
   ],
   template: `
     <div class="page-container">
@@ -81,16 +84,32 @@ import { debounceTime, Subject } from 'rxjs';
               Inactive
             </button>
           </div>
+          <div class="export-buttons">
+            <button mat-stroked-button
+                    [matMenuTriggerFor]="exportMenu"
+                    [disabled]="members().length === 0"
+                    matTooltip="Export data">
+              <mat-icon>download</mat-icon>
+              Export
+            </button>
+            <mat-menu #exportMenu="matMenu">
+              <button mat-menu-item (click)="exportToCsv()">
+                <mat-icon>table_chart</mat-icon>
+                <span>Export to CSV</span>
+              </button>
+              <button mat-menu-item (click)="printTable()">
+                <mat-icon>print</mat-icon>
+                <span>Print</span>
+              </button>
+            </mat-menu>
+          </div>
         </div>
       </div>
 
       <!-- Members Table -->
       <div class="card table-card">
         @if (isLoading()) {
-          <div class="loading-container">
-            <mat-spinner diameter="40"></mat-spinner>
-            <p>Loading members...</p>
-          </div>
+          <app-table-skeleton [rowCount]="5" [columnWidths]="['25%', '25%', '15%', '15%', '10%']"></app-table-skeleton>
         } @else if (members().length === 0) {
           <div class="empty-state">
             <mat-icon class="empty-icon">groups</mat-icon>
@@ -299,6 +318,18 @@ import { debounceTime, Subject } from 'rxjs';
       color: white;
     }
 
+    .export-buttons {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .export-buttons button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .table-card {
       padding: 0;
       overflow: hidden;
@@ -466,6 +497,7 @@ import { debounceTime, Subject } from 'rxjs';
 export class MembersListComponent implements OnInit {
   private membersService = inject(MembersService);
   private confirmDialog = inject(ConfirmDialogService);
+  private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
@@ -667,5 +699,25 @@ export class MembersListComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Export functionality
+  private readonly exportColumns: ExportColumn[] = [
+    { key: 'fullName', header: 'Full Name' },
+    { key: 'email', header: 'Email' },
+    { key: 'phoneNumber', header: 'Phone Number' },
+    { key: 'dateOfBirth', header: 'Date of Birth', formatter: (v) => v ? new Date(v).toLocaleDateString() : '' },
+    { key: 'joinedOn', header: 'Joined On', formatter: (v) => v ? new Date(v).toLocaleDateString() : '' },
+    { key: 'isActive', header: 'Status', formatter: (v) => v ? 'Active' : 'Inactive' }
+  ];
+
+  exportToCsv(): void {
+    const filename = `members_${new Date().toISOString().split('T')[0]}`;
+    this.exportService.exportToCsv(this.members(), this.exportColumns, filename);
+    this.snackBar.open('Members exported to CSV', 'Close', { duration: 3000 });
+  }
+
+  printTable(): void {
+    this.exportService.printTable(this.members(), this.exportColumns, 'Members List');
   }
 }

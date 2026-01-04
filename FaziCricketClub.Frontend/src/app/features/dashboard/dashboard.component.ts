@@ -10,6 +10,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { StatsService } from '../../core/services/stats.service';
 import { FixturesService } from '../../core/services/fixtures.service';
 import { ClubStats, Fixture, LeaderboardEntry } from '../../shared/models';
+import { DashboardSkeletonComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
 
 interface StatCard {
   title: string;
@@ -28,7 +29,8 @@ interface StatCard {
     MatCardModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    DashboardSkeletonComponent
   ],
   template: `
     <div class="dashboard">
@@ -48,10 +50,7 @@ interface StatCard {
 
       <!-- Loading State -->
       @if (isLoading()) {
-        <div class="loading-container">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading dashboard data...</p>
-        </div>
+        <app-dashboard-skeleton></app-dashboard-skeleton>
       } @else {
         <!-- Stats Grid -->
         <div class="stats-grid">

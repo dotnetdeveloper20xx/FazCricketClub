@@ -7,8 +7,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { StatsService } from '../../core/services/stats.service';
 import { SeasonsService } from '../../core/services/seasons.service';
+import { ExportService, ExportColumn } from '../../core/services/export.service';
 import { LeaderboardEntry, Season } from '../../shared/models';
 import { forkJoin } from 'rxjs';
 
@@ -23,7 +27,10 @@ import { forkJoin } from 'rxjs';
     MatTabsModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   template: `
     <div class="page-container">
@@ -32,15 +39,42 @@ import { forkJoin } from 'rxjs';
           <h1 class="page-title">Leaderboards</h1>
           <p class="page-description">Top performers in batting and bowling</p>
         </div>
-        <mat-form-field appearance="outline" class="season-filter">
-          <mat-label>Season</mat-label>
-          <mat-select [value]="selectedSeason()" (selectionChange)="onSeasonChange($event.value)">
-            <mat-option value="">All Time</mat-option>
-            @for (season of seasons(); track season.id) {
-              <mat-option [value]="season.id">{{ season.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <div class="header-actions">
+          <mat-form-field appearance="outline" class="season-filter">
+            <mat-label>Season</mat-label>
+            <mat-select [value]="selectedSeason()" (selectionChange)="onSeasonChange($event.value)">
+              <mat-option value="">All Time</mat-option>
+              @for (season of seasons(); track season.id) {
+                <mat-option [value]="season.id">{{ season.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button mat-stroked-button
+                  [matMenuTriggerFor]="exportMenu"
+                  [disabled]="battingLeaderboard().length === 0 && bowlingLeaderboard().length === 0"
+                  matTooltip="Export data">
+            <mat-icon>download</mat-icon>
+            Export
+          </button>
+          <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item (click)="exportBattingToCsv()">
+              <mat-icon>sports_cricket</mat-icon>
+              <span>Export Batting Stats</span>
+            </button>
+            <button mat-menu-item (click)="exportBowlingToCsv()">
+              <mat-icon>sports_baseball</mat-icon>
+              <span>Export Bowling Stats</span>
+            </button>
+            <button mat-menu-item (click)="exportAllToCsv()">
+              <mat-icon>table_chart</mat-icon>
+              <span>Export All Stats</span>
+            </button>
+            <button mat-menu-item (click)="printLeaderboards()">
+              <mat-icon>print</mat-icon>
+              <span>Print</span>
+            </button>
+          </mat-menu>
+        </div>
       </div>
 
       @if (isLoading()) {
@@ -158,6 +192,12 @@ import { forkJoin } from 'rxjs';
     .page-description {
       color: var(--app-text-secondary);
       margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
     .season-filter {
@@ -341,6 +381,8 @@ import { forkJoin } from 'rxjs';
 export class LeaderboardsComponent implements OnInit {
   private statsService = inject(StatsService);
   private seasonsService = inject(SeasonsService);
+  private exportService = inject(ExportService);
+  private snackBar = inject(MatSnackBar);
 
   // State
   battingLeaderboard = signal<LeaderboardEntry[]>([]);
@@ -401,6 +443,78 @@ export class LeaderboardsComponent implements OnInit {
       case 1: return 'military_tech';
       case 2: return 'workspace_premium';
       default: return '';
+    }
+  }
+
+  // Export functionality
+  private readonly battingColumns: ExportColumn[] = [
+    { key: 'rank', header: 'Rank' },
+    { key: 'memberName', header: 'Player' },
+    { key: 'value', header: 'Runs' },
+    { key: 'secondaryValue', header: 'Average' }
+  ];
+
+  private readonly bowlingColumns: ExportColumn[] = [
+    { key: 'rank', header: 'Rank' },
+    { key: 'memberName', header: 'Player' },
+    { key: 'value', header: 'Wickets' },
+    { key: 'secondaryValue', header: 'Average' }
+  ];
+
+  exportBattingToCsv(): void {
+    const data = this.battingLeaderboard().map((entry, i) => ({ ...entry, rank: i + 1 }));
+    const filename = `batting_leaderboard_${new Date().toISOString().split('T')[0]}`;
+    this.exportService.exportToCsv(data, this.battingColumns, filename);
+    this.snackBar.open('Batting stats exported to CSV', 'Close', { duration: 3000 });
+  }
+
+  exportBowlingToCsv(): void {
+    const data = this.bowlingLeaderboard().map((entry, i) => ({ ...entry, rank: i + 1 }));
+    const filename = `bowling_leaderboard_${new Date().toISOString().split('T')[0]}`;
+    this.exportService.exportToCsv(data, this.bowlingColumns, filename);
+    this.snackBar.open('Bowling stats exported to CSV', 'Close', { duration: 3000 });
+  }
+
+  exportAllToCsv(): void {
+    this.exportBattingToCsv();
+    setTimeout(() => this.exportBowlingToCsv(), 500);
+  }
+
+  printLeaderboards(): void {
+    const battingData = this.battingLeaderboard().map((entry, i) => ({ ...entry, rank: i + 1 }));
+    const bowlingData = this.bowlingLeaderboard().map((entry, i) => ({ ...entry, rank: i + 1 }));
+
+    const battingHtml = this.exportService.generatePrintableTable(battingData, this.battingColumns, 'Top Run Scorers');
+    const bowlingHtml = this.exportService.generatePrintableTable(bowlingData, this.bowlingColumns, 'Top Wicket Takers');
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Leaderboards</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { color: #2eb82e; font-size: 24px; margin-bottom: 16px; }
+              p { color: #666; margin-bottom: 16px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+              th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+              th { background-color: #2eb82e; color: white; }
+              tr:nth-child(even) { background-color: #f8f8f8; }
+              @media print { body { -webkit-print-color-adjust: exact; } }
+            </style>
+          </head>
+          <body>
+            <h1>Cricket Club Leaderboards</h1>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+            ${battingHtml}
+            ${bowlingHtml}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 500);
     }
   }
 }
