@@ -43,3 +43,7 @@ packages/
 ## Documentation (only README.md is tracked)
 *.md
 !README.md
+
+## Windows reserved device names
+nul
+NUL
