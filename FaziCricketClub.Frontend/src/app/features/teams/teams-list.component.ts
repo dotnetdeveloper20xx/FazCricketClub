@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { TeamsService } from '../../core/services/teams.service';
+import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
 import { Team } from '../../shared/models';
 
 @Component({
@@ -372,6 +373,7 @@ import { Team } from '../../shared/models';
 })
 export class TeamsListComponent implements OnInit {
   private teamsService = inject(TeamsService);
+  private confirmDialog = inject(ConfirmDialogService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
@@ -491,17 +493,19 @@ export class TeamsListComponent implements OnInit {
   }
 
   deleteTeam(team: Team): void {
-    if (confirm(`Are you sure you want to delete "${team.name}"?`)) {
-      this.teamsService.deleteTeam(team.id).subscribe({
-        next: () => {
-          this.snackBar.open('Team deleted successfully', 'Close', { duration: 3000 });
-          this.loadTeams();
-        },
-        error: (error) => {
-          console.error('Error deleting team:', error);
-          this.snackBar.open('Failed to delete team', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmDelete(team.name, 'Team').subscribe(confirmed => {
+      if (confirmed) {
+        this.teamsService.deleteTeam(team.id).subscribe({
+          next: () => {
+            this.snackBar.open('Team deleted successfully', 'Close', { duration: 3000 });
+            this.loadTeams();
+          },
+          error: (error) => {
+            console.error('Error deleting team:', error);
+            this.snackBar.open('Failed to delete team', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

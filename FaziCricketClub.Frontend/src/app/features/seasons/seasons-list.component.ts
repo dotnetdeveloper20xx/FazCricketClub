@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { SeasonsService } from '../../core/services/seasons.service';
+import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
 import { Season, CreateSeasonRequest } from '../../shared/models';
 
 @Component({
@@ -503,6 +504,7 @@ import { Season, CreateSeasonRequest } from '../../shared/models';
 })
 export class SeasonsListComponent implements OnInit {
   private seasonsService = inject(SeasonsService);
+  private confirmDialog = inject(ConfirmDialogService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
@@ -650,17 +652,19 @@ export class SeasonsListComponent implements OnInit {
   }
 
   deleteSeason(season: Season): void {
-    if (confirm(`Are you sure you want to delete "${season.name}"?`)) {
-      this.seasonsService.deleteSeason(season.id).subscribe({
-        next: () => {
-          this.snackBar.open('Season deleted successfully', 'Close', { duration: 3000 });
-          this.loadSeasons();
-        },
-        error: (error) => {
-          console.error('Error deleting season:', error);
-          this.snackBar.open('Failed to delete season', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmDelete(season.name, 'Season').subscribe(confirmed => {
+      if (confirmed) {
+        this.seasonsService.deleteSeason(season.id).subscribe({
+          next: () => {
+            this.snackBar.open('Season deleted successfully', 'Close', { duration: 3000 });
+            this.loadSeasons();
+          },
+          error: (error) => {
+            console.error('Error deleting season:', error);
+            this.snackBar.open('Failed to delete season', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

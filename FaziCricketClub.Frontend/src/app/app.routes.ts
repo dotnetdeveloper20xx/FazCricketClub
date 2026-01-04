@@ -72,6 +72,11 @@ export const routes: Routes = [
         title: 'Matches - FaziCricketClub'
       },
       {
+        path: 'matches/:id',
+        loadComponent: () => import('./features/matches/match-detail.component').then(m => m.MatchDetailComponent),
+        title: 'Match Details - FaziCricketClub'
+      },
+      {
         path: 'seasons',
         loadComponent: () => import('./features/seasons/seasons-list.component').then(m => m.SeasonsListComponent),
         title: 'Seasons - FaziCricketClub'

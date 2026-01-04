@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MembersService } from '../../core/services/members.service';
+import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
 import { Member, PaginatedResponse } from '../../shared/models';
 import { debounceTime, Subject } from 'rxjs';
 
@@ -464,6 +465,7 @@ import { debounceTime, Subject } from 'rxjs';
 })
 export class MembersListComponent implements OnInit {
   private membersService = inject(MembersService);
+  private confirmDialog = inject(ConfirmDialogService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
@@ -651,17 +653,19 @@ export class MembersListComponent implements OnInit {
   }
 
   deleteMember(member: Member): void {
-    if (confirm(`Are you sure you want to delete ${member.fullName}?`)) {
-      this.membersService.deleteMember(member.id).subscribe({
-        next: () => {
-          this.snackBar.open('Member deleted successfully', 'Close', { duration: 3000 });
-          this.loadMembers();
-        },
-        error: (error) => {
-          console.error('Error deleting member:', error);
-          this.snackBar.open('Failed to delete member', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmDelete(member.fullName, 'Member').subscribe(confirmed => {
+      if (confirmed) {
+        this.membersService.deleteMember(member.id).subscribe({
+          next: () => {
+            this.snackBar.open('Member deleted successfully', 'Close', { duration: 3000 });
+            this.loadMembers();
+          },
+          error: (error) => {
+            console.error('Error deleting member:', error);
+            this.snackBar.open('Failed to delete member', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

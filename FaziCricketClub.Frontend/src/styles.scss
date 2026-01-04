@@ -155,7 +155,8 @@ html {
 // =====================================================
 // CSS Custom Properties (Design Tokens)
 // =====================================================
-:root {
+:root,
+.light-theme {
   // Brand Colors
   --app-primary: #2eb82e;
   --app-primary-dark: #1c961c;
@@ -168,6 +169,7 @@ html {
   --app-surface: #ffffff;
   --app-surface-alt: #f8fafc;
   --app-surface-elevated: #ffffff;
+  --app-background: #f5f5f5;
 
   // Text Colors
   --app-text: #1e293b;
@@ -182,6 +184,42 @@ html {
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
+
+  // Shadows
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+// Dark Theme
+.dark-theme {
+  // Brand Colors (keep vibrant in dark mode)
+  --app-primary: #4ade80;
+  --app-primary-dark: #22c55e;
+  --app-primary-light: #86efac;
+  --app-secondary: #fbbf24;
+  --app-secondary-dark: #f59e0b;
+  --app-accent: #818cf8;
+
+  // Surface Colors (dark surfaces)
+  --app-surface: #1e1e2e;
+  --app-surface-alt: #11111b;
+  --app-surface-elevated: #2a2a3e;
+  --app-background: #11111b;
+
+  // Text Colors (light text for dark backgrounds)
+  --app-text: #f8fafc;
+  --app-text-secondary: #a1a1aa;
+  --app-text-muted: #71717a;
+
+  // Border & Dividers
+  --app-border: #3f3f46;
+  --app-divider: #27272a;
+
+  // Shadows (subtle in dark mode)
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
 }
 
 // =====================================================
@@ -331,11 +369,11 @@ a {
 
 // Cards
 .card {
-  background-color: white;
+  background-color: var(--app-surface);
   border-radius: 0.75rem;
   padding: 1.5rem;
   box-shadow: var(--shadow-card);
-  transition: box-shadow 200ms ease;
+  transition: box-shadow 200ms ease, background-color 200ms ease;
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
@@ -343,7 +381,7 @@ a {
 }
 
 .card-flat {
-  background-color: white;
+  background-color: var(--app-surface);
   border-radius: 0.75rem;
   padding: 1.5rem;
   border: 1px solid var(--app-border);
@@ -423,7 +461,7 @@ a {
 .stat-card {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: var(--app-surface);
   border-radius: 0.75rem;
   padding: 1.5rem;
   box-shadow: var(--shadow-card);
@@ -431,13 +469,13 @@ a {
   .stat-value {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--app-text);
     font-family: 'Montserrat', system-ui, sans-serif;
   }
 
   .stat-label {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--app-text-secondary);
     margin-top: 0.25rem;
   }
 
@@ -481,7 +519,7 @@ a {
 // Table Styles
 .data-table {
   width: 100%;
-  background-color: white;
+  background-color: var(--app-surface);
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -491,22 +529,22 @@ a {
     text-align: left;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--app-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background-color: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: var(--app-surface-alt);
+    border-bottom: 1px solid var(--app-border);
   }
 
   td {
     padding: 1rem 1.5rem;
     font-size: 0.875rem;
-    color: #475569;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--app-text-secondary);
+    border-bottom: 1px solid var(--app-divider);
   }
 
   tr:hover td {
-    background-color: #f8fafc;
+    background-color: var(--app-surface-alt);
   }
 }
 
@@ -630,4 +668,115 @@ a {
 
 .mat-mdc-fab.mat-primary {
   --mdc-fab-container-color: var(--app-primary);
+}
+
+// =====================================================
+// Dark Theme Material Overrides
+// =====================================================
+.dark-theme {
+  // Material Table
+  .mat-mdc-table {
+    background-color: var(--app-surface);
+  }
+
+  .mat-mdc-header-cell {
+    background-color: var(--app-surface-elevated);
+    color: var(--app-text-secondary);
+  }
+
+  .mat-mdc-cell {
+    color: var(--app-text);
+    border-bottom-color: var(--app-border);
+  }
+
+  .mat-mdc-row:hover {
+    background-color: var(--app-surface-elevated);
+  }
+
+  // Material Form Fields
+  .mat-mdc-form-field {
+    --mdc-outlined-text-field-outline-color: var(--app-border);
+    --mdc-outlined-text-field-label-text-color: var(--app-text-secondary);
+    --mdc-outlined-text-field-input-text-color: var(--app-text);
+    --mdc-outlined-text-field-caret-color: var(--app-primary);
+    --mdc-outlined-text-field-focus-outline-color: var(--app-primary);
+    --mdc-outlined-text-field-hover-outline-color: var(--app-text-muted);
+  }
+
+  // Material Menu
+  .mat-mdc-menu-panel {
+    background-color: var(--app-surface-elevated);
+  }
+
+  .mat-mdc-menu-item {
+    color: var(--app-text);
+
+    &:hover {
+      background-color: var(--app-surface);
+    }
+  }
+
+  // Material Dialog
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--app-surface);
+  }
+
+  // Material Select
+  .mat-mdc-select-panel {
+    background-color: var(--app-surface-elevated);
+  }
+
+  .mat-mdc-option {
+    color: var(--app-text);
+
+    &:hover:not(.mat-mdc-option-disabled) {
+      background-color: var(--app-surface);
+    }
+  }
+
+  // Material Chips
+  .mat-mdc-standard-chip {
+    background-color: var(--app-surface-elevated);
+    color: var(--app-text);
+  }
+
+  // Material Paginator
+  .mat-mdc-paginator {
+    background-color: var(--app-surface);
+    color: var(--app-text);
+  }
+
+  // Material Icons
+  .mat-icon {
+    color: var(--app-text-secondary);
+  }
+
+  // Material Card
+  .mat-mdc-card {
+    background-color: var(--app-surface);
+    color: var(--app-text);
+  }
+
+  // Material Tab
+  .mat-mdc-tab {
+    color: var(--app-text-secondary);
+
+    &.mdc-tab--active {
+      color: var(--app-primary);
+    }
+  }
+
+  // Material Progress Spinner
+  .mat-mdc-progress-spinner circle {
+    stroke: var(--app-primary);
+  }
+
+  // Button overrides in dark mode
+  .btn-ghost {
+    color: var(--app-text-secondary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--app-surface-elevated);
+    }
+  }
 }

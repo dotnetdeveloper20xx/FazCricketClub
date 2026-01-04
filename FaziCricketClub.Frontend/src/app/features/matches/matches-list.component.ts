@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +17,7 @@ import { FixturesService } from '../../core/services/fixtures.service';
 import { TeamsService } from '../../core/services/teams.service';
 import { SeasonsService } from '../../core/services/seasons.service';
 import { Fixture, Team, Season, PaginatedResponse, FixtureStatus } from '../../shared/models';
+import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -23,6 +25,7 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     ReactiveFormsModule,
     MatIconModule,
@@ -150,6 +153,10 @@ import { forkJoin } from 'rxjs';
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
+                    <a mat-menu-item [routerLink]="['/matches', fixture.id]">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View Details</span>
+                    </a>
                     <button mat-menu-item (click)="openFixtureDialog(fixture)">
                       <mat-icon>edit</mat-icon>
                       <span>Edit</span>
@@ -703,6 +710,7 @@ export class MatchesListComponent implements OnInit {
   private fixturesService = inject(FixturesService);
   private teamsService = inject(TeamsService);
   private seasonsService = inject(SeasonsService);
+  private confirmDialog = inject(ConfirmDialogService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
@@ -910,18 +918,21 @@ export class MatchesListComponent implements OnInit {
   }
 
   deleteFixture(fixture: Fixture): void {
-    if (confirm(`Are you sure you want to delete this match?`)) {
-      this.fixturesService.deleteFixture(fixture.id).subscribe({
-        next: () => {
-          this.snackBar.open('Match deleted successfully', 'Close', { duration: 3000 });
-          this.loadFixtures();
-        },
-        error: (error) => {
-          console.error('Error deleting fixture:', error);
-          this.snackBar.open('Failed to delete match', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    const matchName = `${fixture.homeTeamName || 'TBD'} vs ${fixture.awayTeamName || 'TBD'}`;
+    this.confirmDialog.confirmDelete(matchName, 'Match').subscribe(confirmed => {
+      if (confirmed) {
+        this.fixturesService.deleteFixture(fixture.id).subscribe({
+          next: () => {
+            this.snackBar.open('Match deleted successfully', 'Close', { duration: 3000 });
+            this.loadFixtures();
+          },
+          error: (error) => {
+            console.error('Error deleting fixture:', error);
+            this.snackBar.open('Failed to delete match', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   openResultDialog(fixture: Fixture): void {

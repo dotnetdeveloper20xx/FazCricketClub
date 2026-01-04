@@ -13,6 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AdminService } from '../../../core/services/admin.service';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { AdminUser, AdminRole } from '../../../shared/models';
 import { forkJoin } from 'rxjs';
 
@@ -375,6 +376,7 @@ import { forkJoin } from 'rxjs';
 })
 export class UsersListComponent implements OnInit {
   private adminService = inject(AdminService);
+  private confirmDialog = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
 
   // State
@@ -454,33 +456,45 @@ export class UsersListComponent implements OnInit {
       return;
     }
 
-    if (confirm(`Remove "${roleName}" role from ${user.userName}?`)) {
-      this.adminService.removeRole(user.id, roleName).subscribe({
-        next: () => {
-          this.snackBar.open(`Role "${roleName}" removed from ${user.userName}`, 'Close', { duration: 3000 });
-          this.loadData();
-        },
-        error: (error) => {
-          console.error('Error removing role:', error);
-          this.snackBar.open('Failed to remove role', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmAction(
+      'Remove Role',
+      `Remove "${roleName}" role from ${user.userName}?`,
+      'Remove'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.adminService.removeRole(user.id, roleName).subscribe({
+          next: () => {
+            this.snackBar.open(`Role "${roleName}" removed from ${user.userName}`, 'Close', { duration: 3000 });
+            this.loadData();
+          },
+          error: (error) => {
+            console.error('Error removing role:', error);
+            this.snackBar.open('Failed to remove role', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   lockUser(user: AdminUser, minutes: number): void {
-    if (confirm(`Lock ${user.userName} for ${minutes} minutes?`)) {
-      this.adminService.lockUser(user.id, { minutes }).subscribe({
-        next: () => {
-          this.snackBar.open(`${user.userName} locked for ${minutes} minutes`, 'Close', { duration: 3000 });
-          this.loadData();
-        },
-        error: (error) => {
-          console.error('Error locking user:', error);
-          this.snackBar.open('Failed to lock user', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmAction(
+      'Lock User',
+      `Lock ${user.userName} for ${minutes} minutes?`,
+      'Lock'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.adminService.lockUser(user.id, { minutes }).subscribe({
+          next: () => {
+            this.snackBar.open(`${user.userName} locked for ${minutes} minutes`, 'Close', { duration: 3000 });
+            this.loadData();
+          },
+          error: (error) => {
+            console.error('Error locking user:', error);
+            this.snackBar.open('Failed to lock user', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   unlockUser(user: AdminUser): void {

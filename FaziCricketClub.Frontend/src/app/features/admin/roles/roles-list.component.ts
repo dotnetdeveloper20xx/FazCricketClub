@@ -11,6 +11,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AdminService } from '../../../core/services/admin.service';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { AdminRole, Permission } from '../../../shared/models';
 import { forkJoin } from 'rxjs';
 
@@ -374,6 +375,7 @@ import { forkJoin } from 'rxjs';
 })
 export class RolesListComponent implements OnInit {
   private adminService = inject(AdminService);
+  private confirmDialog = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
 
   // State
@@ -473,17 +475,23 @@ export class RolesListComponent implements OnInit {
   }
 
   removePermission(role: AdminRole, permission: string): void {
-    if (confirm(`Remove "${permission}" from ${role.name}?`)) {
-      this.adminService.removePermissionFromRole(role.name, permission).subscribe({
-        next: () => {
-          this.snackBar.open(`Permission "${permission}" removed from ${role.name}`, 'Close', { duration: 3000 });
-          this.loadData();
-        },
-        error: (error) => {
-          console.error('Error removing permission:', error);
-          this.snackBar.open('Failed to remove permission', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    this.confirmDialog.confirmAction(
+      'Remove Permission',
+      `Remove "${permission}" from ${role.name}?`,
+      'Remove'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.adminService.removePermissionFromRole(role.name, permission).subscribe({
+          next: () => {
+            this.snackBar.open(`Permission "${permission}" removed from ${role.name}`, 'Close', { duration: 3000 });
+            this.loadData();
+          },
+          error: (error) => {
+            console.error('Error removing permission:', error);
+            this.snackBar.open('Failed to remove permission', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

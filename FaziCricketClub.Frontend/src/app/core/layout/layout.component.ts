@@ -15,6 +15,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs
 
 import { AuthService } from '../auth/auth.service';
 import { SearchService, SearchResult } from '../services/search.service';
+import { ThemeService } from '../services/theme.service';
 
 interface NavItem {
   label: string;
@@ -100,6 +101,13 @@ interface NavItem {
         </div>
 
         <div class="header-right">
+          <button mat-icon-button
+                  [matTooltip]="themeService.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                  class="header-icon-btn theme-toggle"
+                  (click)="themeService.toggleTheme()">
+            <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+
           <button mat-icon-button matTooltip="Notifications" class="header-icon-btn">
             <mat-icon>notifications</mat-icon>
             <span class="notification-badge">3</span>
@@ -729,6 +737,7 @@ interface NavItem {
 })
 export class LayoutComponent {
   authService = inject(AuthService);
+  themeService = inject(ThemeService);
   private searchService = inject(SearchService);
   private router = inject(Router);
 
