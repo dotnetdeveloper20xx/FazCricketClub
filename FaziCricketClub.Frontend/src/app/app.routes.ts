@@ -47,9 +47,24 @@ export const routes: Routes = [
         title: 'Members - FaziCricketClub'
       },
       {
+        path: 'members/:id',
+        loadComponent: () => import('./features/members/member-detail.component').then(m => m.MemberDetailComponent),
+        title: 'Member Details - FaziCricketClub'
+      },
+      {
         path: 'teams',
         loadComponent: () => import('./features/teams/teams-list.component').then(m => m.TeamsListComponent),
         title: 'Teams - FaziCricketClub'
+      },
+      {
+        path: 'teams/:id',
+        loadComponent: () => import('./features/teams/team-detail.component').then(m => m.TeamDetailComponent),
+        title: 'Team Details - FaziCricketClub'
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
+        title: 'My Profile - FaziCricketClub'
       },
       {
         path: 'matches',

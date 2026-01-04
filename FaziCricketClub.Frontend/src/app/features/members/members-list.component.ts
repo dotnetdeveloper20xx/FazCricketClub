@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +23,7 @@ import { debounceTime, Subject } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     ReactiveFormsModule,
     MatIconModule,
@@ -107,10 +109,10 @@ import { debounceTime, Subject } from 'rxjs';
               <ng-container matColumnDef="fullName">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
                 <td mat-cell *matCellDef="let member">
-                  <div class="member-name">
+                  <a [routerLink]="['/members', member.id]" class="member-name">
                     <div class="avatar">{{ getInitials(member.fullName) }}</div>
                     <span>{{ member.fullName }}</span>
-                  </div>
+                  </a>
                 </td>
               </ng-container>
 
