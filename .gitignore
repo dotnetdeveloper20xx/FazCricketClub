@@ -37,7 +37,7 @@ packages/
 *.bak
 *.log
 
-## Claude Code
+## IDE/Tool settings
 .claude/
 
 ## Documentation (only README.md is tracked)
