@@ -81,6 +81,13 @@ This application provides a complete solution for managing cricket club operatio
 - **ASP.NET Core Identity** - Comprehensive user authentication and authorization
 - **SQL Server** - Enterprise-grade relational database
 
+#### Frontend Framework
+- **Angular 19** - Modern component-based frontend framework
+- **TailwindCSS v4** - Utility-first CSS framework with custom sports theme
+- **Angular Material** - Material Design component library
+- **TypeScript 5.x** - Type-safe JavaScript
+- **RxJS** - Reactive programming with observables
+
 #### Libraries & Packages
 - **AutoMapper 13.0.1** - Object-to-object mapping
 - **FluentValidation 12.1.1** - Fluent interface for validation rules
@@ -171,8 +178,22 @@ FazCricketClub/
 │   └── Data/                          # Identity DbContext
 │       └── CricketClubIdentityDbContext.cs
 │
-└── FaziCricketClub.Tests.Unit/         # Unit tests
-    └── Services/                       # Service tests
+├── FaziCricketClub.Tests.Unit/         # Unit tests
+│   └── Services/                       # Service tests
+│
+└── FaziCricketClub.Frontend/           # Angular 19 Frontend
+    ├── src/app/
+    │   ├── core/                       # Core services, guards, interceptors
+    │   │   └── layout/                 # Main app shell (header, sidebar)
+    │   ├── features/                   # Feature modules (lazy-loaded)
+    │   │   ├── dashboard/              # Dashboard with stats & activity
+    │   │   ├── members/                # Member management
+    │   │   ├── teams/                  # Team management
+    │   │   ├── matches/                # Match scheduling
+    │   │   └── auth/                   # Login/Register pages
+    │   └── shared/                     # Shared components, models
+    ├── tailwind.config.js              # TailwindCSS v4 theme
+    └── angular.json                    # Angular CLI config
 ```
 
 ---
@@ -181,10 +202,15 @@ FazCricketClub/
 
 ### Prerequisites
 
+**Backend:**
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
 - [SQL Server 2019+](https://www.microsoft.com/sql-server) or SQL Server Express
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (17.13+) or [VS Code](https://code.visualstudio.com/)
 - [Git](https://git-scm.com/)
+
+**Frontend:**
+- [Node.js 22+](https://nodejs.org/) (LTS recommended)
+- [Angular CLI 19+](https://angular.dev/) (`npm install -g @angular/cli`)
 
 ### Installation Steps
 
@@ -272,10 +298,21 @@ cd FaziCricketClub.API
 dotnet run
 ```
 
-#### 6. Access Swagger UI
+#### 6. Run the Angular Frontend
 
-- **Identity API**: https://localhost:7001/swagger
-- **Main API**: https://localhost:7000/swagger
+```bash
+cd FaziCricketClub.Frontend
+npm install
+ng serve
+```
+
+The frontend will be available at: **http://localhost:4200**
+
+#### 7. Access APIs & Frontend
+
+- **Angular Frontend**: http://localhost:4200
+- **Identity API Swagger**: https://localhost:7001/swagger (or http://localhost:5105/swagger)
+- **Main API Swagger**: https://localhost:7000/swagger (or http://localhost:5062/swagger)
 
 ---
 
@@ -554,9 +591,18 @@ Full interactive API documentation via Swagger UI:
 
 ## 🚧 Roadmap
 
+### Completed Features
+
+- [x] **Angular 19 Frontend** (Phase 1 Complete)
+  - Modern sports-themed UI with TailwindCSS + Angular Material
+  - Responsive layout with collapsible sidebar
+  - Dashboard with stats, upcoming matches, recent activity
+  - Login/Register pages with form validation
+  - Lazy-loaded routes for optimal performance
+
 ### Planned Features
 
-- [ ] Angular/React frontend application
+- [ ] Auth integration with backend APIs (Phase 2)
 - [ ] Real-time match updates (SignalR)
 - [ ] Player performance analytics dashboard
 - [ ] Team selection AI recommendations

@@ -1,0 +1,633 @@
+// =====================================================
+// FaziCricketClub - Modern Sports Theme
+// Angular Material + TailwindCSS v4 Integration
+// =====================================================
+
+// ALL @use statements must come first
+@use '@angular/material' as mat;
+
+// =====================================================
+// Custom Sports Theme Palette - Cricket Green & Gold
+// =====================================================
+$cricket-green-palette: (
+  50: #e6f7e6,
+  100: #c2ebc2,
+  200: #9bde9b,
+  300: #72d172,
+  400: #52c652,
+  500: #2eb82e,
+  600: #26a826,
+  700: #1c961c,
+  800: #148414,
+  900: #0a640a,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: rgba(0, 0, 0, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+);
+
+$championship-gold-palette: (
+  50: #fff8e6,
+  100: #ffecb3,
+  200: #ffe080,
+  300: #ffd54d,
+  400: #ffca28,
+  500: #ffc107,
+  600: #ffb300,
+  700: #ffa000,
+  800: #ff8f00,
+  900: #ff6f00,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: rgba(0, 0, 0, 0.87),
+    500: rgba(0, 0, 0, 0.87),
+    600: rgba(0, 0, 0, 0.87),
+    700: rgba(0, 0, 0, 0.87),
+    800: rgba(0, 0, 0, 0.87),
+    900: rgba(0, 0, 0, 0.87),
+  )
+);
+
+// Apply custom Material theme
+html {
+  @include mat.theme((
+    color: (
+      primary: $cricket-green-palette,
+      tertiary: $championship-gold-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+// =====================================================
+// TailwindCSS v4 Import (using @import since @use doesn't work for CSS)
+// =====================================================
+@import "tailwindcss";
+
+// Custom theme configuration for TailwindCSS v4
+@theme {
+  // Primary Colors - Cricket Green
+  --color-primary-50: #e6f7e6;
+  --color-primary-100: #c2ebc2;
+  --color-primary-200: #9bde9b;
+  --color-primary-300: #72d172;
+  --color-primary-400: #52c652;
+  --color-primary-500: #2eb82e;
+  --color-primary-600: #26a826;
+  --color-primary-700: #1c961c;
+  --color-primary-800: #148414;
+  --color-primary-900: #0a640a;
+
+  // Secondary Colors - Championship Gold
+  --color-secondary-50: #fff8e6;
+  --color-secondary-100: #ffecb3;
+  --color-secondary-200: #ffe080;
+  --color-secondary-300: #ffd54d;
+  --color-secondary-400: #ffca28;
+  --color-secondary-500: #ffc107;
+  --color-secondary-600: #ffb300;
+  --color-secondary-700: #ffa000;
+  --color-secondary-800: #ff8f00;
+  --color-secondary-900: #ff6f00;
+
+  // Accent Colors - Team Blue
+  --color-accent-50: #e8eaf6;
+  --color-accent-100: #c5cae9;
+  --color-accent-200: #9fa8da;
+  --color-accent-300: #7986cb;
+  --color-accent-400: #5c6bc0;
+  --color-accent-500: #3f51b5;
+  --color-accent-600: #3949ab;
+  --color-accent-700: #303f9f;
+  --color-accent-800: #283593;
+  --color-accent-900: #1a237e;
+
+  // Surface Colors
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #eeeeee;
+  --color-surface-300: #e0e0e0;
+  --color-surface-400: #bdbdbd;
+  --color-surface-500: #9e9e9e;
+  --color-surface-600: #757575;
+  --color-surface-700: #616161;
+  --color-surface-800: #424242;
+  --color-surface-900: #212121;
+
+  // Semantic Colors
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  // Custom Shadows
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  // Custom Border Radius
+  --radius-card: 12px;
+  --radius-button: 8px;
+
+  // Fonts
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+// =====================================================
+// Google Fonts
+// =====================================================
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+// =====================================================
+// CSS Custom Properties (Design Tokens)
+// =====================================================
+:root {
+  // Brand Colors
+  --app-primary: #2eb82e;
+  --app-primary-dark: #1c961c;
+  --app-primary-light: #52c652;
+  --app-secondary: #ffc107;
+  --app-secondary-dark: #ff8f00;
+  --app-accent: #3f51b5;
+
+  // Surface Colors
+  --app-surface: #ffffff;
+  --app-surface-alt: #f8fafc;
+  --app-surface-elevated: #ffffff;
+
+  // Text Colors
+  --app-text: #1e293b;
+  --app-text-secondary: #64748b;
+  --app-text-muted: #94a3b8;
+
+  // Border & Dividers
+  --app-border: #e2e8f0;
+  --app-divider: #f1f5f9;
+
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+// =====================================================
+// Base Styles
+// =====================================================
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--app-surface-alt);
+  color: var(--app-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// =====================================================
+// Typography
+// =====================================================
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  color: var(--app-text);
+}
+
+h1 { font-size: 2.5rem; letter-spacing: -0.025em; }
+h2 { font-size: 2rem; letter-spacing: -0.025em; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--app-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--app-primary-dark);
+  }
+}
+
+// =====================================================
+// Custom Component Classes
+// =====================================================
+
+// Buttons
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.5rem;
+  transition: all 200ms ease;
+  cursor: pointer;
+  border: none;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 184, 46, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background-color: var(--app-primary);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover:not(:disabled) {
+    background-color: var(--app-primary-dark);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--app-secondary);
+  color: #1e293b;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover:not(:disabled) {
+    background-color: var(--app-secondary-dark);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--app-primary);
+  color: var(--app-primary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--app-primary);
+    color: white;
+  }
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: #64748b;
+
+  &:hover:not(:disabled) {
+    background-color: #f1f5f9;
+  }
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+// Cards
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 200ms ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+.card-flat {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid var(--app-border);
+}
+
+// Form Inputs
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #1e293b;
+  transition: all 200ms ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--app-primary);
+    box-shadow: 0 0 0 3px rgba(46, 184, 46, 0.15);
+  }
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+.form-error {
+  font-size: 0.875rem;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+}
+
+// Badges
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-primary {
+  background-color: #e6f7e6;
+  color: #0a640a;
+}
+
+// Stats Card
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+
+  .stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    font-family: 'Montserrat', system-ui, sans-serif;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+  }
+
+  .stat-change {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+
+    &.positive {
+      color: var(--color-success);
+    }
+
+    &.negative {
+      color: var(--color-error);
+    }
+  }
+}
+
+// Page Layout
+.page-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-description {
+    color: #64748b;
+  }
+}
+
+// Table Styles
+.data-table {
+  width: 100%;
+  background-color: white;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+
+  th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    color: #475569;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  tr:hover td {
+    background-color: #f8fafc;
+  }
+}
+
+// =====================================================
+// Utility Classes
+// =====================================================
+.text-gradient {
+  background: linear-gradient(to right, var(--app-primary), var(--app-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.sports-gradient {
+  background: linear-gradient(135deg, #2eb82e 0%, #1c961c 50%, #0a640a 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #ffca28 0%, #ffc107 50%, #ff8f00 100%);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #2eb82e 0%, #1c961c 50%, #0a640a 100%);
+}
+
+.animate-in {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+// =====================================================
+// Animations
+// =====================================================
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 184, 46, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(46, 184, 46, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 184, 46, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+// =====================================================
+// Scrollbar Styling
+// =====================================================
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--app-surface-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--app-text-muted);
+  }
+}
+
+// =====================================================
+// Selection
+// =====================================================
+::selection {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+// =====================================================
+// Angular Material Overrides
+// =====================================================
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: var(--color-success);
+    --mdc-snackbar-supporting-text-color: white;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: var(--color-error);
+    --mdc-snackbar-supporting-text-color: white;
+  }
+
+  &.warning-snackbar {
+    --mdc-snackbar-container-color: var(--color-warning);
+    --mdc-snackbar-supporting-text-color: white;
+  }
+}
+
+// Override Material button to match sports theme
+.mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--app-primary);
+}
+
+.mat-mdc-fab.mat-primary {
+  --mdc-fab-container-color: var(--app-primary);
+}
