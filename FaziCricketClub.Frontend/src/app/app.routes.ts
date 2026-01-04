@@ -86,6 +86,11 @@ export const routes: Routes = [
             title: 'Leaderboards - FaziCricketClub'
           },
           {
+            path: 'analytics',
+            loadComponent: () => import('./features/statistics/analytics.component').then(m => m.AnalyticsComponent),
+            title: 'Analytics - FaziCricketClub'
+          },
+          {
             path: 'player/:id',
             loadComponent: () => import('./features/statistics/player-stats.component').then(m => m.PlayerStatsComponent),
             title: 'Player Statistics - FaziCricketClub'
@@ -96,6 +101,12 @@ export const routes: Routes = [
             pathMatch: 'full'
           }
         ]
+      },
+      // User settings
+      {
+        path: 'settings',
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+        title: 'Settings - FaziCricketClub'
       },
       // Admin routes
       {
@@ -111,6 +122,11 @@ export const routes: Routes = [
             path: 'roles',
             loadComponent: () => import('./features/admin/roles/roles-list.component').then(m => m.RolesListComponent),
             title: 'Role Management - FaziCricketClub'
+          },
+          {
+            path: 'settings',
+            loadComponent: () => import('./features/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent),
+            title: 'Admin Settings - FaziCricketClub'
           }
         ]
       }

@@ -1,6 +1,7 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,8 +10,11 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 
 import { AuthService } from '../auth/auth.service';
+import { SearchService, SearchResult } from '../services/search.service';
 
 interface NavItem {
   label: string;
@@ -24,6 +28,7 @@ interface NavItem {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -34,7 +39,8 @@ interface NavItem {
     MatListModule,
     MatMenuModule,
     MatTooltipModule,
-    MatDividerModule
+    MatDividerModule,
+    MatProgressSpinnerModule
   ],
   template: `
     <div class="app-layout">
@@ -56,9 +62,40 @@ interface NavItem {
         </div>
 
         <div class="header-center">
-          <div class="search-box">
+          <div class="search-box" #searchContainer>
             <mat-icon class="search-icon">search</mat-icon>
-            <input type="text" placeholder="Search members, matches, teams..." class="search-input" />
+            <input type="text"
+                   placeholder="Search members, matches, teams..."
+                   class="search-input"
+                   [(ngModel)]="searchQuery"
+                   (input)="onSearchInput()"
+                   (focus)="showSearchResults = true"
+                   (keydown.escape)="closeSearch()"
+                   (keydown.enter)="navigateToFirstResult()" />
+            @if (isSearching()) {
+              <mat-spinner diameter="20" class="search-spinner"></mat-spinner>
+            }
+            @if (showSearchResults && (searchResults().length > 0 || searchQuery.length >= 2)) {
+              <div class="search-results">
+                @if (searchResults().length === 0 && searchQuery.length >= 2) {
+                  <div class="search-empty">
+                    <mat-icon>search_off</mat-icon>
+                    <span>No results found for "{{ searchQuery }}"</span>
+                  </div>
+                } @else {
+                  @for (result of searchResults(); track result.id + result.type) {
+                    <a class="search-result-item" [routerLink]="result.route" (click)="closeSearch()">
+                      <mat-icon class="result-icon" [class]="result.type">{{ result.icon }}</mat-icon>
+                      <div class="result-content">
+                        <span class="result-title">{{ result.title }}</span>
+                        <span class="result-subtitle">{{ result.subtitle }}</span>
+                      </div>
+                      <span class="result-type">{{ result.type }}</span>
+                    </a>
+                  }
+                }
+              </div>
+            }
           </div>
         </div>
 
@@ -298,6 +335,124 @@ interface NavItem {
     .search-input:focus {
       outline: none;
       background: rgba(255, 255, 255, 0.25);
+    }
+
+    .search-spinner {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1100;
+    }
+
+    .search-empty {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      color: #64748b;
+    }
+
+    .search-empty mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      opacity: 0.5;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #1e293b;
+      transition: background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .search-result-item:hover {
+      background: #f1f5f9;
+    }
+
+    .search-result-item:first-child {
+      border-radius: 12px 12px 0 0;
+    }
+
+    .search-result-item:last-child {
+      border-radius: 0 0 12px 12px;
+    }
+
+    .result-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .result-icon.member {
+      background: rgba(46, 184, 46, 0.15);
+      color: #2eb82e;
+    }
+
+    .result-icon.team {
+      background: rgba(25, 118, 210, 0.15);
+      color: #1976d2;
+    }
+
+    .result-icon.match {
+      background: rgba(255, 152, 0, 0.15);
+      color: #ff9800;
+    }
+
+    .result-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .result-title {
+      font-weight: 500;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .result-subtitle {
+      font-size: 12px;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .result-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      color: #64748b;
+      font-weight: 500;
     }
 
     .header-right {
@@ -574,7 +729,60 @@ interface NavItem {
 })
 export class LayoutComponent {
   authService = inject(AuthService);
+  private searchService = inject(SearchService);
+  private router = inject(Router);
+
+  @ViewChild('searchContainer') searchContainer!: ElementRef;
+
   sidebarExpanded = signal(true);
+  searchQuery = '';
+  showSearchResults = false;
+  isSearching = signal(false);
+  searchResults = signal<SearchResult[]>([]);
+
+  private searchSubject = new Subject<string>();
+
+  constructor() {
+    // Setup debounced search
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (query.length < 2) {
+          return of([]);
+        }
+        this.isSearching.set(true);
+        return this.searchService.search(query);
+      })
+    ).subscribe(results => {
+      this.searchResults.set(results);
+      this.isSearching.set(false);
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.searchContainer && !this.searchContainer.nativeElement.contains(event.target)) {
+      this.closeSearch();
+    }
+  }
+
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  closeSearch(): void {
+    this.showSearchResults = false;
+  }
+
+  navigateToFirstResult(): void {
+    const results = this.searchResults();
+    if (results.length > 0) {
+      this.router.navigate([results[0].route]);
+      this.closeSearch();
+      this.searchQuery = '';
+    }
+  }
 
   // Computed properties for user display
   displayName = computed(() => {
@@ -612,6 +820,7 @@ export class LayoutComponent {
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { label: 'Matches', icon: 'sports_score', route: '/matches' },
     { label: 'Leaderboards', icon: 'leaderboard', route: '/statistics/leaderboards' },
+    { label: 'Analytics', icon: 'analytics', route: '/statistics/analytics' },
   ];
 
   managementNavItems: NavItem[] = [
