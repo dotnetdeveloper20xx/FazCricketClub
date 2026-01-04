@@ -70,8 +70,7 @@ namespace FaziCricketClub.API.Controllers
                 this.logger.LogError(ex, "Error occurred while seeding data.");
                 return StatusCode(500, new
                 {
-                    error = "An error occurred while seeding data",
-                    details = ex.Message
+                    error = "An error occurred while seeding data. Check logs for details."
                 });
             }
         }
@@ -110,8 +109,7 @@ namespace FaziCricketClub.API.Controllers
                 this.logger.LogError(ex, "Error occurred while clearing data.");
                 return StatusCode(500, new
                 {
-                    error = "An error occurred while clearing data",
-                    details = ex.Message
+                    error = "An error occurred while clearing data. Check logs for details."
                 });
             }
         }

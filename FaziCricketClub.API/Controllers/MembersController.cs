@@ -2,6 +2,7 @@
 using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
 using FaziCricketClub.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FaziCricketClub.API.Controllers
@@ -12,6 +13,7 @@ namespace FaziCricketClub.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class MembersController : ControllerBase
     {
         private readonly IMemberService _memberService;
@@ -25,6 +27,7 @@ namespace FaziCricketClub.API.Controllers
         /// Returns a paged, filterable, sortable list of members.
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "CanViewPlayers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<ApiResponse<PagedResult<MemberDto>>>> GetPagedAsync(
             [FromQuery] MemberFilterParameters filter,
@@ -52,7 +55,8 @@ namespace FaziCricketClub.API.Controllers
         /// <summary>
         /// Gets all members.
         /// </summary>
-        [HttpGet]
+        [HttpGet("all")]
+        [Authorize(Policy = "CanViewPlayers")]
         public async Task<ActionResult<ApiResponse<IEnumerable<MemberDto>>>> GetAllAsync(
             CancellationToken cancellationToken)
         {
@@ -66,6 +70,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets a single member by its identifier.
         /// </summary>
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "CanViewPlayers")]
         public async Task<ActionResult<ApiResponse<MemberDto>>> GetByIdAsync(
             int id,
             CancellationToken cancellationToken)
@@ -85,6 +90,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "CanEditPlayers")]
         public async Task<ActionResult<ApiResponse<MemberDto>>> CreateAsync(
             [FromBody] CreateMemberDto request,
             CancellationToken cancellationToken)
@@ -101,6 +107,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "CanEditPlayers")]
         public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] UpdateMemberDto request,
@@ -129,6 +136,7 @@ namespace FaziCricketClub.API.Controllers
         /// Deletes an existing member (soft delete).
         /// </summary>
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "CanEditPlayers")]
         public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var deleted = await _memberService.DeleteAsync(id, cancellationToken);

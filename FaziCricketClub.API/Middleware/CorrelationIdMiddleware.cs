@@ -30,7 +30,7 @@
             if (context.Request.Headers.TryGetValue(CorrelationIdHeaderName, out var headerValues)
                 && !string.IsNullOrWhiteSpace(headerValues.FirstOrDefault()))
             {
-                correlationId = headerValues.First();
+                correlationId = headerValues.FirstOrDefault() ?? Guid.NewGuid().ToString();
             }
             else
             {

@@ -1,12 +1,14 @@
 ﻿using FaziCricketClub.API.Models;
 using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FaziCricketClub.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class StatsController : ControllerBase
     {
         private readonly IClubStatsService _clubStatsService;

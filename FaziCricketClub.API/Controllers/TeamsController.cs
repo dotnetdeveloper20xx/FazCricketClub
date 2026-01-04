@@ -1,6 +1,7 @@
 ﻿using FaziCricketClub.API.Models;
 using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FaziCricketClub.API.Controllers
@@ -11,6 +12,7 @@ namespace FaziCricketClub.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TeamsController : ControllerBase
     {
         private readonly ITeamService _teamService;
@@ -24,6 +26,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets all teams.
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "CanViewTeams")]
         public async Task<ActionResult<ApiResponse<IEnumerable<TeamDto>>>> GetAllAsync(CancellationToken cancellationToken)
         {
             var teams = await _teamService.GetAllAsync(cancellationToken);
@@ -36,6 +39,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets a single team by its identifier.
         /// </summary>
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "CanViewTeams")]
         public async Task<ActionResult<ApiResponse<TeamDto>>> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var team = await _teamService.GetByIdAsync(id, cancellationToken);
@@ -53,6 +57,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "CanEditTeams")]
         public async Task<ActionResult<ApiResponse<TeamDto>>> CreateAsync(
       [FromBody] CreateTeamDto request,
       CancellationToken cancellationToken)
@@ -69,6 +74,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "CanEditTeams")]
         public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] UpdateTeamDto request,
@@ -97,6 +103,7 @@ namespace FaziCricketClub.API.Controllers
         /// Deletes an existing team.
         /// </summary>
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "CanEditTeams")]
         public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var deleted = await _teamService.DeleteAsync(id, cancellationToken);

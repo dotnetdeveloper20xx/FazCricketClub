@@ -1,6 +1,7 @@
 ﻿using FaziCricketClub.API.Models;
 using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FaziCricketClub.API.Controllers
@@ -11,6 +12,7 @@ namespace FaziCricketClub.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FixturesController : ControllerBase
     {
         private readonly IFixtureService _fixtureService;
@@ -33,6 +35,7 @@ namespace FaziCricketClub.API.Controllers
         /// </summary>
         /// <param name="fixtureId">The ID of the fixture.</param>
         [HttpDelete("{fixtureId:int}/result")]
+        [Authorize(Policy = "CanEditFixtures")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteResultAsync(
             int fixtureId,
@@ -54,6 +57,7 @@ namespace FaziCricketClub.API.Controllers
         /// <param name="fixtureId">The ID of the fixture.</param>
         /// <param name="request">Match result summary and scorecards.</param>
         [HttpPost("{fixtureId:int}/result")]
+        [Authorize(Policy = "CanEditFixtures")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ApiResponse<MatchResultDetailDto>>> UpsertResultAsync(
@@ -99,6 +103,7 @@ namespace FaziCricketClub.API.Controllers
         /// </summary>
         /// <param name="fixtureId">The ID of the fixture.</param>
         [HttpGet("{fixtureId:int}/result")]
+        [Authorize(Policy = "CanViewFixtures")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ApiResponse<MatchResultDetailDto>>> GetResultAsync(
@@ -133,6 +138,7 @@ namespace FaziCricketClub.API.Controllers
         /// <param name="teamId">Optional team id to filter by.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("upcoming")]
+        [Authorize(Policy = "CanViewFixtures")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<ApiResponse<IEnumerable<FixtureDto>>>> GetUpcomingAsync(
             [FromQuery] int days = 7,
@@ -162,6 +168,7 @@ namespace FaziCricketClub.API.Controllers
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet]
+        [Authorize(Policy = "CanViewFixtures")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<ApiResponse<PagedResult<FixtureDto>>>> GetPagedAsync(
             [FromQuery] FixtureFilterParameters filter,
@@ -190,7 +197,8 @@ namespace FaziCricketClub.API.Controllers
         /// <summary>
         /// Gets all fixtures.
         /// </summary>
-        [HttpGet]
+        [HttpGet("all")]
+        [Authorize(Policy = "CanViewFixtures")]
         public async Task<ActionResult<ApiResponse<IEnumerable<FixtureDto>>>> GetAllAsync(
             CancellationToken cancellationToken)
         {
@@ -204,6 +212,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets a single fixture by its identifier.
         /// </summary>
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "CanViewFixtures")]
         public async Task<ActionResult<ApiResponse<FixtureDto>>> GetByIdAsync(
             int id,
             CancellationToken cancellationToken)
@@ -226,6 +235,7 @@ namespace FaziCricketClub.API.Controllers
         /// Creates a new fixture.
         /// </summary>
         [HttpPost]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<ActionResult<ApiResponse<FixtureDto>>> CreateAsync(
             [FromBody] CreateFixtureDto request,
             CancellationToken cancellationToken)
@@ -252,6 +262,7 @@ namespace FaziCricketClub.API.Controllers
         /// Updates an existing fixture.
         /// </summary>
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] UpdateFixtureDto request,
@@ -285,6 +296,7 @@ namespace FaziCricketClub.API.Controllers
         /// Deletes an existing fixture (soft delete).
         /// </summary>
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var deleted = await _fixtureService.DeleteAsync(id, cancellationToken);

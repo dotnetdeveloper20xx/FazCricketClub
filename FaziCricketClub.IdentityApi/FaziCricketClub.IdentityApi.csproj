@@ -12,7 +12,8 @@
 
 		<!-- Enforce high code quality: treat all warnings as errors -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
+	  <UserSecretsId>aae89f76-1e71-4ac5-adf6-800e69b1d849</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<!-- ASP.NET Core Identity + EntityFrameworkCore integration -->

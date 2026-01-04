@@ -2,16 +2,81 @@ using FaziCricketClub.IdentityApi.Configuration;
 using FaziCricketClub.IdentityApi.Data;
 using FaziCricketClub.IdentityApi.Entities;
 using FaziCricketClub.IdentityApi.Infrastructure;
+using FaziCricketClub.IdentityApi.Middleware;
 using FaziCricketClub.IdentityApi.Security;
 using FaziCricketClub.IdentityApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ------------------------------------------------------------
+// RATE LIMITING - Protect against brute-force attacks
+// ------------------------------------------------------------
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Global rate limit: 100 requests per minute per IP
+    options.AddPolicy("GlobalLimit", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    // Strict rate limit for authentication endpoints: 10 requests per minute per IP
+    options.AddPolicy("AuthLimit", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
+
+// ------------------------------------------------------------
+// CORS CONFIGURATION
+// ------------------------------------------------------------
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:4200",
+                "https://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+
+    options.AddPolicy("Production", policy =>
+    {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (allowedOrigins != null && allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    });
+});
 
 // ------------------------------------------------------------
 // CONFIGURATION BINDING
@@ -77,8 +142,6 @@ builder.Services
     .AddEntityFrameworkStores<CricketClubIdentityDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>() // Required for login checks.
     .AddDefaultTokenProviders();
-
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
 // ------------------------------------------------------------
 // AUTHENTICATION + AUTHORIZATION
@@ -214,6 +277,9 @@ using (var scope = app.Services.CreateScope())
 // MIDDLEWARE PIPELINE
 // ------------------------------------------------------------
 
+// Security headers should be added early
+app.UseSecurityHeaders();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -221,6 +287,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Rate limiting should come early in the pipeline
+app.UseRateLimiter();
+
+// CORS must come before authentication
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAngularDev");
+}
+else
+{
+    app.UseCors("Production");
+}
 
 // Order is important: authentication before authorization.
 app.UseAuthentication();

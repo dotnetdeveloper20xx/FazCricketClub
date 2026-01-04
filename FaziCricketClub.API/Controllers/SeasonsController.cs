@@ -1,6 +1,7 @@
 ﻿using FaziCricketClub.API.Models;
 using FaziCricketClub.Application.Dtos;
 using FaziCricketClub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace FaziCricketClub.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class SeasonsController : ControllerBase
     {
         private readonly ISeasonService _seasonService;
@@ -25,6 +27,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets all seasons.
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "CanViewFixtures")]
         public async Task<ActionResult<ApiResponse<IEnumerable<SeasonDto>>>> GetAllAsync(CancellationToken cancellationToken)
         {
             var seasons = await _seasonService.GetAllAsync(cancellationToken);
@@ -37,6 +40,7 @@ namespace FaziCricketClub.API.Controllers
         /// Gets a single season by its identifier.
         /// </summary>
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "CanViewFixtures")]
         public async Task<ActionResult<ApiResponse<SeasonDto>>> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var season = await _seasonService.GetByIdAsync(id, cancellationToken);
@@ -55,6 +59,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<ActionResult<ApiResponse<SeasonDto>>> CreateAsync(
      [FromBody] CreateSeasonDto request,
      CancellationToken cancellationToken)
@@ -72,6 +77,7 @@ namespace FaziCricketClub.API.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] UpdateSeasonDto request,
@@ -100,6 +106,7 @@ namespace FaziCricketClub.API.Controllers
         /// Deletes an existing season.
         /// </summary>
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "CanEditFixtures")]
         public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var deleted = await _seasonService.DeleteAsync(id, cancellationToken);

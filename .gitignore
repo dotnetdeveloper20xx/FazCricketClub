@@ -39,3 +39,7 @@ packages/
 
 ## Claude Code
 .claude/
+
+## Documentation (only README.md is tracked)
+*.md
+!README.md

@@ -4,6 +4,7 @@ using FaziCricketClub.IdentityApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace FaziCricketClub.IdentityApi.Controllers
@@ -18,6 +19,7 @@ namespace FaziCricketClub.IdentityApi.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("AuthLimit")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -89,16 +91,14 @@ namespace FaziCricketClub.IdentityApi.Controllers
                 return this.BadRequest(new { message = "User registration failed.", errors });
             }
 
-            // Optional role assignment.
-            if (!string.IsNullOrWhiteSpace(request.Role))
-            {
-                var roleResult = await this.userManager.AddToRoleAsync(user, request.Role);
+            // Assign default "Player" role to all new registrations.
+            // Elevated roles (Captain, Admin) must be assigned by an administrator.
+            const string defaultRole = "Player";
+            var roleResult = await this.userManager.AddToRoleAsync(user, defaultRole);
 
-                if (!roleResult.Succeeded)
-                {
-                    this.logger.LogWarning("Failed to assign role {Role} to user {Email}.", request.Role, request.Email);
-                    // We don't fail registration; the user exists but without the requested role.
-                }
+            if (!roleResult.Succeeded)
+            {
+                this.logger.LogWarning("Failed to assign default role {Role} to user {Email}.", defaultRole, request.Email);
             }
 
             // Issue JWT token for the newly registered user.

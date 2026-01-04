@@ -26,10 +26,5 @@ namespace FaziCricketClub.IdentityApi.Models
         [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Optional role to assign on registration (e.g., "Player").
-        /// In many systems this would be controlled server-side.
-        /// </summary>
-        public string? Role { get; set; }
     }
 }
