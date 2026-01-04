@@ -617,8 +617,7 @@ export class LayoutComponent {
   managementNavItems: NavItem[] = [
     { label: 'Members', icon: 'groups', route: '/members' },
     { label: 'Teams', icon: 'group_work', route: '/teams' },
-    { label: 'Practice Sessions', icon: 'fitness_center', route: '/practice' },
-    { label: 'Equipment', icon: 'sports_cricket', route: '/equipment' },
+    { label: 'Seasons', icon: 'date_range', route: '/seasons' },
   ];
 
   adminNavItems: NavItem[] = [

@@ -9,7 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/auth/auth.service';
 import { StatsService } from '../../core/services/stats.service';
 import { FixturesService } from '../../core/services/fixtures.service';
-import { ClubStats, Fixture } from '../../shared/models';
+import { ClubStats, Fixture, LeaderboardEntry } from '../../shared/models';
 
 interface StatCard {
   title: string;
@@ -178,33 +178,82 @@ interface StatCard {
             </div>
           </div>
 
-          <!-- Recent Activity Placeholder -->
-          <div class="card recent-activity animate-in">
+          <!-- Top Performers -->
+          <div class="card leaderboard-preview animate-in">
             <div class="card-header">
               <h3 class="card-title">
-                <mat-icon>history</mat-icon>
-                Club Information
+                <mat-icon>leaderboard</mat-icon>
+                Top Performers
               </h3>
+              <a mat-button class="view-all-btn" routerLink="/statistics/leaderboards">View All</a>
             </div>
-            <div class="info-content">
-              <div class="info-item">
-                <mat-icon>groups</mat-icon>
-                <div>
-                  <strong>Total Members:</strong> {{ clubStats()?.totalMembers || 0 }}
-                </div>
+            <div class="leaderboard-content">
+              <div class="leaderboard-section">
+                <h4 class="section-label"><mat-icon>sports_cricket</mat-icon> Top Batters</h4>
+                @if (topBatters().length === 0) {
+                  <p class="no-data">No data available</p>
+                } @else {
+                  @for (entry of topBatters(); track entry.memberId; let i = $index) {
+                    <div class="leaderboard-item">
+                      <span class="rank" [class]="getRankClass(i)">{{ i + 1 }}</span>
+                      <a [routerLink]="['/statistics/player', entry.memberId]" class="player-name">{{ entry.memberName }}</a>
+                      <span class="stat-value">{{ entry.value }} runs</span>
+                    </div>
+                  }
+                }
               </div>
-              <div class="info-item">
-                <mat-icon>group_work</mat-icon>
-                <div>
-                  <strong>Total Teams:</strong> {{ clubStats()?.totalTeams || 0 }}
-                </div>
+              <div class="leaderboard-section">
+                <h4 class="section-label"><mat-icon>sports_baseball</mat-icon> Top Bowlers</h4>
+                @if (topBowlers().length === 0) {
+                  <p class="no-data">No data available</p>
+                } @else {
+                  @for (entry of topBowlers(); track entry.memberId; let i = $index) {
+                    <div class="leaderboard-item">
+                      <span class="rank" [class]="getRankClass(i)">{{ i + 1 }}</span>
+                      <a [routerLink]="['/statistics/player', entry.memberId]" class="player-name">{{ entry.memberName }}</a>
+                      <span class="stat-value">{{ entry.value }} wkts</span>
+                    </div>
+                  }
+                }
               </div>
-              <div class="info-item">
-                <mat-icon>sports_cricket</mat-icon>
-                <div>
-                  <strong>Total Fixtures:</strong> {{ clubStats()?.totalFixtures || 0 }}
+            </div>
+          </div>
+
+          <!-- Recent Results -->
+          <div class="card recent-results animate-in">
+            <div class="card-header">
+              <h3 class="card-title">
+                <mat-icon>scoreboard</mat-icon>
+                Recent Results
+              </h3>
+              <a mat-button class="view-all-btn" routerLink="/matches">View All</a>
+            </div>
+            <div class="results-list">
+              @if (recentResults().length === 0) {
+                <div class="empty-state small">
+                  <mat-icon>sports_score</mat-icon>
+                  <p>No recent match results</p>
                 </div>
-              </div>
+              } @else {
+                @for (fixture of recentResults(); track fixture.id) {
+                  <div class="result-item">
+                    <div class="result-teams">
+                      <span class="team">{{ fixture.homeTeamName }}</span>
+                      @if (fixture.matchResult) {
+                        <span class="score">{{ fixture.matchResult.homeTeamRuns }}/{{ fixture.matchResult.homeTeamWickets }}</span>
+                      }
+                    </div>
+                    <span class="vs-badge">vs</span>
+                    <div class="result-teams away">
+                      <span class="team">{{ fixture.awayTeamName }}</span>
+                      @if (fixture.matchResult) {
+                        <span class="score">{{ fixture.matchResult.awayTeamRuns }}/{{ fixture.matchResult.awayTeamWickets }}</span>
+                      }
+                    </div>
+                    <div class="result-date">{{ fixture.startDateTime | date:'MMM d' }}</div>
+                  </div>
+                }
+              }
             </div>
           </div>
         </div>
@@ -630,6 +679,165 @@ interface StatCard {
       }
     }
 
+    /* Leaderboard Preview */
+    .leaderboard-content {
+      padding: 16px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .leaderboard-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--app-text-secondary);
+      margin: 0 0 8px;
+      text-transform: uppercase;
+    }
+
+    .section-label mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--app-surface-alt);
+      border-radius: 8px;
+    }
+
+    .rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--app-background);
+      color: var(--app-text-secondary);
+    }
+
+    .rank.gold {
+      background: linear-gradient(135deg, #ffd700, #ffb300);
+      color: #5d4e00;
+    }
+
+    .rank.silver {
+      background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+      color: #404040;
+    }
+
+    .rank.bronze {
+      background: linear-gradient(135deg, #cd7f32, #b06c2a);
+      color: #3d2810;
+    }
+
+    .player-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--app-text);
+      text-decoration: none;
+    }
+
+    .player-name:hover {
+      color: var(--app-primary);
+    }
+
+    .stat-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--app-primary);
+    }
+
+    .no-data {
+      font-size: 13px;
+      color: var(--app-text-muted);
+      font-style: italic;
+      padding: 8px 0;
+      margin: 0;
+    }
+
+    /* Recent Results */
+    .results-list {
+      padding: 12px 24px;
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--app-divider);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-teams {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .result-teams.away {
+      text-align: right;
+    }
+
+    .result-teams .team {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .result-teams .score {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--app-primary);
+    }
+
+    .vs-badge {
+      padding: 4px 8px;
+      background: var(--app-surface-alt);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--app-text-secondary);
+    }
+
+    .result-date {
+      font-size: 12px;
+      color: var(--app-text-secondary);
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .empty-state.small {
+      padding: 24px 20px;
+    }
+
+    .empty-state.small mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
       .content-grid {
@@ -638,6 +846,10 @@ interface StatCard {
 
       .stats-overview {
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .leaderboard-content {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -672,6 +884,9 @@ export class DashboardComponent implements OnInit {
   // State signals
   clubStats = signal<ClubStats | null>(null);
   upcomingFixtures = signal<Fixture[]>([]);
+  recentResults = signal<Fixture[]>([]);
+  topBatters = signal<LeaderboardEntry[]>([]);
+  topBowlers = signal<LeaderboardEntry[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
@@ -739,22 +954,59 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load club stats:', err);
-        // Don't show error if just no data
       }
     });
 
     // Load upcoming fixtures
     this.fixturesService.getUpcomingFixtures(30).subscribe({
       next: (fixtures) => {
-        this.upcomingFixtures.set(fixtures.slice(0, 5)); // Show top 5
+        this.upcomingFixtures.set(fixtures.slice(0, 5));
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Failed to load upcoming fixtures:', err);
         this.isLoading.set(false);
-        // Don't show error for empty fixtures
       }
     });
+
+    // Load recent completed matches
+    this.fixturesService.getFixtures({ status: 'Completed', pageSize: 5 }).subscribe({
+      next: (response) => {
+        this.recentResults.set(response.items.slice(0, 5));
+      },
+      error: (err) => {
+        console.error('Failed to load recent results:', err);
+      }
+    });
+
+    // Load top batters
+    this.statsService.getBattingLeaderboard(undefined, 3).subscribe({
+      next: (entries) => {
+        this.topBatters.set(entries);
+      },
+      error: (err) => {
+        console.error('Failed to load batting leaderboard:', err);
+      }
+    });
+
+    // Load top bowlers
+    this.statsService.getBowlingLeaderboard(undefined, 3).subscribe({
+      next: (entries) => {
+        this.topBowlers.set(entries);
+      },
+      error: (err) => {
+        console.error('Failed to load bowling leaderboard:', err);
+      }
+    });
+  }
+
+  getRankClass(index: number): string {
+    switch (index) {
+      case 0: return 'gold';
+      case 1: return 'silver';
+      case 2: return 'bronze';
+      default: return '';
+    }
   }
 
   getDay(dateStr: string): string {
