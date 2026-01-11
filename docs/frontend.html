@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Architecture - FaziCricketClub | Faz Ahmed</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">&#9918;</span>
+                <span>FaziCricketClub</span>
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">Overview</a>
+                <a href="backend.html">Backend</a>
+                <a href="frontend.html" class="active">Frontend</a>
+            </nav>
+            <div class="developer-badge">
+                <span>Developed by</span>
+                <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="page-hero frontend-hero">
+            <div class="container">
+                <div class="hero-badge">Angular 20 / TypeScript 5.8</div>
+                <h1>Frontend Architecture</h1>
+                <p class="hero-subtitle">Modern Angular application with signals-based state management, Material Design components, and reactive patterns</p>
+            </div>
+        </section>
+
+        <!-- Demo Disclaimer -->
+        <section class="disclaimer-banner">
+            <div class="container">
+                <div class="disclaimer-content">
+                    <span class="disclaimer-icon">&#9888;</span>
+                    <div>
+                        <strong>Demo Version Notice:</strong> This is a sanitized demonstration version. Due to security protocols and client privacy policies, sensitive business logic, proprietary algorithms, and confidential configurations have been removed. The technical architecture and patterns demonstrated are authentic work by Faz Ahmed.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Overview -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Technology Stack</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">NG</div>
+                        <h3>Angular 20</h3>
+                        <p>Latest Angular with standalone components, signals, and improved hydration</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">TS</div>
+                        <h3>TypeScript 5.8</h3>
+                        <p>Full type safety with strict mode, generics, and advanced type inference</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">M3</div>
+                        <h3>Angular Material</h3>
+                        <p>Material Design 3 components with accessibility and theming support</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">TW</div>
+                        <h3>TailwindCSS 4</h3>
+                        <p>Utility-first CSS framework for rapid, responsive styling</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">Rx</div>
+                        <h3>RxJS 7.8</h3>
+                        <p>Reactive extensions for HTTP calls, debouncing, and async operations</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">&#9889;</div>
+                        <h3>Signals</h3>
+                        <p>Fine-grained reactivity with Angular's new signals-based state management</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Application Structure -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Application Structure</h2>
+                <p class="section-intro">Feature-based organization with shared core services and reusable components.</p>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Project Structure</h3>
+                        <span class="file-path">src/app/</span>
+                    </div>
+                    <pre><code class="language-plaintext">src/app/
+├── core/                    # Singleton services & guards
+│   ├── auth/
+│   │   └── auth.service.ts  # Authentication state & methods
+│   ├── guards/
+│   │   └── auth.guard.ts    # Route protection guards
+│   ├── interceptors/
+│   │   └── auth.interceptor.ts
+│   ├── layout/
+│   │   └── layout.component.ts
+│   └── services/
+│       ├── members.service.ts
+│       ├── teams.service.ts
+│       ├── fixtures.service.ts
+│       ├── stats.service.ts
+│       ├── theme.service.ts
+│       └── export.service.ts
+│
+├── features/                # Feature modules
+│   ├── auth/
+│   │   ├── login/
+│   │   └── register/
+│   ├── dashboard/
+│   ├── members/
+│   │   ├── members-list.component.ts
+│   │   └── member-detail.component.ts
+│   ├── teams/
+│   ├── matches/
+│   ├── seasons/
+│   ├── statistics/
+│   │   ├── leaderboards.component.ts
+│   │   ├── analytics.component.ts
+│   │   └── player-stats.component.ts
+│   ├── profile/
+│   ├── settings/
+│   └── admin/
+│       ├── users/
+│       ├── roles/
+│       └── settings/
+│
+├── shared/                  # Shared utilities
+│   ├── components/
+│   │   ├── confirm-dialog/
+│   │   ├── skeleton-loader/
+│   │   └── error-boundary/
+│   ├── models/              # TypeScript interfaces
+│   └── services/
+│
+├── environments/
+├── app.routes.ts            # Route configuration
+├── app.config.ts            # App providers
+└── app.component.ts</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Components -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Feature Components</h2>
+                <p class="section-intro">20+ standalone components covering all aspects of cricket club management.</p>
+
+                <div class="component-grid">
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#128101;</div>
+                            <h3>Members List</h3>
+                        </div>
+                        <p>Paginated member table with search, filtering, sorting, and CRUD operations.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Pagination</span>
+                            <span class="component-tag">Search</span>
+                            <span class="component-tag">Filter</span>
+                            <span class="component-tag">CSV Export</span>
+                            <span class="component-tag">Print</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#128100;</div>
+                            <h3>Member Detail</h3>
+                        </div>
+                        <p>Individual member profile with statistics, match history, and team associations.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Profile View</span>
+                            <span class="component-tag">Stats</span>
+                            <span class="component-tag">History</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#127942;</div>
+                            <h3>Teams List</h3>
+                        </div>
+                        <p>Team management with roster viewing and active/inactive status control.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Team Cards</span>
+                            <span class="component-tag">Roster</span>
+                            <span class="component-tag">Status</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#128197;</div>
+                            <h3>Matches List</h3>
+                        </div>
+                        <p>Fixture schedule with season filtering, status badges, and venue information.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Calendar</span>
+                            <span class="component-tag">Filters</span>
+                            <span class="component-tag">Status</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#128202;</div>
+                            <h3>Match Detail</h3>
+                        </div>
+                        <p>Full scorecard with batting/bowling figures, player of match, and result summary.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Scorecard</span>
+                            <span class="component-tag">Innings</span>
+                            <span class="component-tag">Stats</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#127941;</div>
+                            <h3>Leaderboards</h3>
+                        </div>
+                        <p>Player rankings by runs, wickets, batting average, and bowling economy.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Rankings</span>
+                            <span class="component-tag">Metrics</span>
+                            <span class="component-tag">Filtering</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#128200;</div>
+                            <h3>Analytics</h3>
+                        </div>
+                        <p>Club-wide statistics dashboard with performance metrics and trends.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Charts</span>
+                            <span class="component-tag">Metrics</span>
+                            <span class="component-tag">Trends</span>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">&#9881;</div>
+                            <h3>Settings</h3>
+                        </div>
+                        <p>User preferences including theme selection and notification settings.</p>
+                        <div class="component-features">
+                            <span class="component-tag">Theme</span>
+                            <span class="component-tag">Preferences</span>
+                            <span class="component-tag">Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- State Management -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Signal-Based State Management</h2>
+                <p class="section-intro">Modern Angular signals for fine-grained reactivity without complex state libraries.</p>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Service State with Signals</h3>
+                        <span class="file-path">core/auth/auth.service.ts</span>
+                    </div>
+                    <pre><code class="language-typescript">@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+
+  // Private mutable state
+  private authState = signal&lt;AuthState&gt;({
+    isAuthenticated: false,
+    user: null,
+    token: null,
+    loading: false,
+    error: null
+  });
+
+  // Public readonly computed signals
+  readonly isAuthenticated = computed(() => this.authState().isAuthenticated);
+  readonly currentUser = computed(() => this.authState().user);
+  readonly isLoading = computed(() => this.authState().loading);
+  readonly error = computed(() => this.authState().error);
+
+  login(credentials: LoginRequest): Observable&lt;AuthResponse&gt; {
+    this.authState.update(state => ({ ...state, loading: true, error: null }));
+
+    return this.http.post&lt;AuthApiResponse&gt;(
+      `${environment.identityApiUrl}/auth/login`,
+      credentials
+    ).pipe(
+      map(response => this.transformApiResponse(response)),
+      tap(response => this.handleAuthSuccess(response)),
+      catchError(error => this.handleAuthError(error))
+    );
+  }
+
+  hasPermission(permission: string): boolean {
+    const user = this.currentUser();
+    return user?.permissions?.includes(permission) ?? false;
+  }
+}</code></pre>
+                </div>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Component State with Signals</h3>
+                        <span class="file-path">features/members/members-list.component.ts</span>
+                    </div>
+                    <pre><code class="language-typescript">@Component({
+  selector: 'app-members-list',
+  standalone: true,
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, ...],
+  templateUrl: './members-list.component.html'
+})
+export class MembersListComponent implements OnInit {
+  // Component state as signals
+  members = signal&lt;Member[]&gt;([]);
+  totalCount = signal(0);
+  pageNumber = signal(1);
+  pageSize = signal(10);
+  searchTerm = signal('');
+  isLoading = signal(false);
+  editingMember = signal&lt;Member | null&gt;(null);
+
+  // Computed values
+  displayedColumns = computed(() =>
+    ['avatar', 'fullName', 'email', 'status', 'actions']
+  );
+
+  async loadMembers(): Promise&lt;void&gt; {
+    this.isLoading.set(true);
+
+    const params: MemberFilterParameters = {
+      pageNumber: this.pageNumber(),
+      pageSize: this.pageSize(),
+      search: this.searchTerm() || undefined
+    };
+
+    const response = await firstValueFrom(
+      this.membersService.getMembers(params)
+    );
+
+    this.members.set(response.items);
+    this.totalCount.set(response.totalCount);
+    this.isLoading.set(false);
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Authentication -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Authentication Flow</h2>
+                <p class="section-intro">JWT-based authentication with HTTP interceptors and route guards.</p>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Functional HTTP Interceptor</h3>
+                        <span class="file-path">core/interceptors/auth.interceptor.ts</span>
+                    </div>
+                    <pre><code class="language-typescript">export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  // Skip auth headers for auth endpoints
+  if (isAuthEndpoint(req.url)) {
+    return next(req);
+  }
+
+  const token = authService.getToken();
+  let authReq = req;
+
+  if (token) {
+    authReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        authService.logout();
+        router.navigate(['/auth/login'], {
+          queryParams: { returnUrl: router.url }
+        });
+      }
+      return throwError(() => error);
+    })
+  );
+};</code></pre>
+                </div>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Functional Route Guards</h3>
+                        <span class="file-path">core/guards/auth.guard.ts</span>
+                    </div>
+                    <pre><code class="language-typescript">export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    return true;
+  }
+
+  router.navigate(['/auth/login'], {
+    queryParams: { returnUrl: state.url }
+  });
+  return false;
+};
+
+export const adminGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/auth/login']);
+    return false;
+  }
+
+  if (authService.hasRole('Admin')) {
+    return true;
+  }
+
+  router.navigate(['/unauthorized']);
+  return false;
+};
+
+export const guestGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    router.navigate(['/dashboard']);
+    return false;
+  }
+
+  return true;
+};</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Routing -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Routing Configuration</h2>
+                <p class="section-intro">Lazy-loaded routes with nested layouts and guard protection.</p>
+
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Application Routes</h3>
+                        <span class="file-path">app.routes.ts</span>
+                    </div>
+                    <pre><code class="language-typescript">export const routes: Routes = [
+  // Auth routes (guest only)
+  {
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./features/auth/login/login.component')
+          .then(m => m.LoginComponent)
+      },
+      {
+        path: 'register',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./features/auth/register/register.component')
+          .then(m => m.RegisterComponent)
+      }
+    ]
+  },
+
+  // Protected routes with layout
+  {
+    path: '',
+    component: LayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component')
+          .then(m => m.DashboardComponent),
+        title: 'Dashboard - FaziCricketClub'
+      },
+      {
+        path: 'members',
+        loadComponent: () => import('./features/members/members-list.component')
+          .then(m => m.MembersListComponent)
+      },
+      {
+        path: 'members/:id',
+        loadComponent: () => import('./features/members/member-detail.component')
+          .then(m => m.MemberDetailComponent)
+      },
+      // Admin routes (admin only)
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        children: [
+          {
+            path: 'users',
+            loadComponent: () => import('./features/admin/users/users-list.component')
+              .then(m => m.UsersListComponent)
+          },
+          {
+            path: 'roles',
+            loadComponent: () => import('./features/admin/roles/roles-list.component')
+              .then(m => m.RolesListComponent)
+          }
+        ]
+      }
+    ]
+  },
+
+  { path: 'unauthorized', loadComponent: () =>
+    import('./features/shared/unauthorized/unauthorized.component')
+      .then(m => m.UnauthorizedComponent)
+  },
+  { path: '**', redirectTo: 'auth/login' }
+];</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- UI Patterns -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">UI/UX Patterns</h2>
+                <div class="pattern-grid">
+                    <div class="pattern-card">
+                        <h3>Skeleton Loaders</h3>
+                        <p>Perceived performance with content placeholders during data fetching</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Debounced Search</h3>
+                        <p>300ms debounce on search inputs to reduce API calls</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Confirm Dialogs</h3>
+                        <p>Generic confirmation service for destructive actions</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Toast Notifications</h3>
+                        <p>Material snackbar for success/error feedback</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Error Boundaries</h3>
+                        <p>Component-level error catching and fallback UI</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Dark Mode</h3>
+                        <p>System-aware theme with localStorage persistence</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Responsive Tables</h3>
+                        <p>Material tables with horizontal scroll on mobile</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>CSV Export</h3>
+                        <p>Client-side data export with configurable columns</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screenshots Section -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Application Screenshots</h2>
+                <p class="section-intro">Visual demonstration of key features and user interfaces.</p>
+
+                <div class="screenshot-grid">
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Dashboard Overview<br>
+                            <small>(Add dashboard.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Dashboard</h3>
+                            <p>Club overview with key statistics, upcoming fixtures, and recent activity.</p>
+                            <span class="screenshot-route">/dashboard</span>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Members List<br>
+                            <small>(Add members-list.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Members Management</h3>
+                            <p>Paginated member list with search, filtering, and CRUD operations.</p>
+                            <span class="screenshot-route">/members</span>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Match Scorecard<br>
+                            <small>(Add match-detail.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Match Scorecard</h3>
+                            <p>Detailed match view with batting and bowling statistics.</p>
+                            <span class="screenshot-route">/matches/:id</span>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Leaderboards<br>
+                            <small>(Add leaderboards.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Player Leaderboards</h3>
+                            <p>Rankings by runs, wickets, and performance metrics.</p>
+                            <span class="screenshot-route">/statistics/leaderboards</span>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Dark Mode<br>
+                            <small>(Add dark-mode.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Dark Mode Theme</h3>
+                            <p>Full dark theme support with system preference detection.</p>
+                            <span class="screenshot-route">/settings</span>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            Screenshot: Admin Panel<br>
+                            <small>(Add admin-users.png)</small>
+                        </div>
+                        <div class="screenshot-card-content">
+                            <h3>Admin User Management</h3>
+                            <p>User administration with role assignment (Admin only).</p>
+                            <span class="screenshot-route">/admin/users</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section summary-section">
+            <div class="container">
+                <h2 class="section-title">Frontend Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-number">20+</span>
+                        <span class="summary-label">Components</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">10+</span>
+                        <span class="summary-label">Services</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">15+</span>
+                        <span class="summary-label">Routes</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">3</span>
+                        <span class="summary-label">Role Guards</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">2</span>
+                        <span class="summary-label">Themes</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">100%</span>
+                        <span class="summary-label">Standalone</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">&#9918;</span>
+                    <span>FaziCricketClub Demo</span>
+                </div>
+                <div class="footer-attribution">
+                    <p>&copy; 2025 Faz Ahmed. All rights reserved.</p>
+                    <p>Development & Architecture by <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed - dotnetdeveloper.co.uk</a></p>
+                </div>
+                <div class="footer-ip">
+                    <p class="ip-notice">The architectural design, code patterns, and technical implementation showcased in this demo were developed by Faz Ahmed. While client-specific business logic and data have been removed for confidentiality, the technical architecture and development approach are the intellectual work of Faz Ahmed.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/plaintext.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

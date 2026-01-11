@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Architecture - FaziCricketClub | Faz Ahmed</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">&#9918;</span>
+                <span>FaziCricketClub</span>
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">Overview</a>
+                <a href="backend.html" class="active">Backend</a>
+                <a href="frontend.html">Frontend</a>
+            </nav>
+            <div class="developer-badge">
+                <span>Developed by</span>
+                <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="page-hero backend-hero">
+            <div class="container">
+                <div class="hero-badge">.NET 10 / ASP.NET Core</div>
+                <h1>Backend Architecture</h1>
+                <p class="hero-subtitle">Clean Architecture implementation with enterprise-grade patterns, JWT authentication, and comprehensive API design</p>
+            </div>
+        </section>
+
+        <!-- Demo Disclaimer -->
+        <section class="disclaimer-banner">
+            <div class="container">
+                <div class="disclaimer-content">
+                    <span class="disclaimer-icon">&#9888;</span>
+                    <div>
+                        <strong>Demo Version Notice:</strong> This is a sanitized demonstration version. Due to security protocols and client privacy policies, sensitive business logic, proprietary algorithms, and confidential configurations have been removed. The technical architecture and patterns demonstrated are authentic work by Faz Ahmed.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Overview -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Technology Stack</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">.NET</div>
+                        <h3>ASP.NET Core 10</h3>
+                        <p>Latest .NET framework with minimal APIs, improved performance, and native AOT support</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">EF</div>
+                        <h3>Entity Framework Core</h3>
+                        <p>ORM with code-first migrations, fluent API configuration, and global query filters</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">JWT</div>
+                        <h3>JWT Authentication</h3>
+                        <p>Token-based auth with policy-based authorization and claim-based permissions</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">SQL</div>
+                        <h3>SQL Server</h3>
+                        <p>Relational database with optimized queries and proper indexing strategies</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Clean Architecture</h2>
+                <p class="section-intro">This solution implements Clean Architecture principles with clear separation of concerns across four distinct layers.</p>
+
+                <div class="architecture-diagram">
+                    <div class="arch-layer arch-api">
+                        <h4>FaziCricketClub.API</h4>
+                        <p>Presentation Layer - Controllers, Middleware, API Models</p>
+                    </div>
+                    <div class="arch-arrow">&#8595;</div>
+                    <div class="arch-layer arch-app">
+                        <h4>FaziCricketClub.Application</h4>
+                        <p>Business Logic - Services, DTOs, Validators, Interfaces</p>
+                    </div>
+                    <div class="arch-arrow">&#8595;</div>
+                    <div class="arch-layer arch-domain">
+                        <h4>FaziCricketClub.Domain</h4>
+                        <p>Core Entities - Business Models, Domain Rules</p>
+                    </div>
+                    <div class="arch-arrow">&#8595;</div>
+                    <div class="arch-layer arch-infra">
+                        <h4>FaziCricketClub.Infrastructure</h4>
+                        <p>Data Access - Repositories, DbContext, EF Configurations</p>
+                    </div>
+                </div>
+
+                <div class="project-structure">
+                    <h3>Solution Structure</h3>
+                    <pre><code class="language-plaintext">FaziCricketClub.sln
+├── FaziCricketClub.API                  # Presentation/API layer
+├── FaziCricketClub.Application          # Application/Business Logic layer
+├── FaziCricketClub.Domain               # Domain entities (business models)
+├── FaziCricketClub.Infrastructure       # Data access & external services
+├── FaziCricketClub.IdentityApi          # Authentication/Authorization microservice
+├── FaziCricketClub.Jobs                 # Background jobs
+└── FaziCricketClub.Tests.Unit           # Unit tests</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Design Patterns -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Design Patterns Implemented</h2>
+                <div class="patterns-grid">
+                    <div class="pattern-card">
+                        <h3>Repository Pattern</h3>
+                        <p>Abstracts data access layer with interfaces in Application layer and implementations in Infrastructure</p>
+                        <span class="pattern-tag">Data Access</span>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Unit of Work</h3>
+                        <p>Manages transaction scope across multiple repositories with single SaveChangesAsync()</p>
+                        <span class="pattern-tag">Transaction</span>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Dependency Injection</h3>
+                        <p>Full IoC container with scoped services, interface-based registration</p>
+                        <span class="pattern-tag">SOLID</span>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>DTO Pattern</h3>
+                        <p>Complete separation of domain models from API contracts with AutoMapper</p>
+                        <span class="pattern-tag">API Design</span>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Soft Delete</h3>
+                        <p>IsDeleted flag with global query filters for audit trail preservation</p>
+                        <span class="pattern-tag">Data Integrity</span>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Service Layer</h3>
+                        <p>Business logic encapsulation with single responsibility per service</p>
+                        <span class="pattern-tag">Architecture</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Controllers -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">RESTful API Controllers</h2>
+                <p class="section-intro">Seven controllers exposing 30+ endpoints with proper HTTP verbs, status codes, and authorization policies.</p>
+
+                <div class="controller-showcase">
+                    <div class="controller-card">
+                        <div class="controller-header">
+                            <h3>SeasonsController</h3>
+                            <span class="endpoint-count">5 endpoints</span>
+                        </div>
+                        <div class="endpoints-list">
+                            <div class="endpoint"><span class="method get">GET</span> /api/seasons</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/seasons/{id}</div>
+                            <div class="endpoint"><span class="method post">POST</span> /api/seasons</div>
+                            <div class="endpoint"><span class="method put">PUT</span> /api/seasons/{id}</div>
+                            <div class="endpoint"><span class="method delete">DELETE</span> /api/seasons/{id}</div>
+                        </div>
+                    </div>
+
+                    <div class="controller-card">
+                        <div class="controller-header">
+                            <h3>FixturesController</h3>
+                            <span class="endpoint-count">9 endpoints</span>
+                        </div>
+                        <div class="endpoints-list">
+                            <div class="endpoint"><span class="method get">GET</span> /api/fixtures</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/fixtures/upcoming</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/fixtures/{id}</div>
+                            <div class="endpoint"><span class="method post">POST</span> /api/fixtures</div>
+                            <div class="endpoint"><span class="method put">PUT</span> /api/fixtures/{id}</div>
+                            <div class="endpoint"><span class="method delete">DELETE</span> /api/fixtures/{id}</div>
+                            <div class="endpoint"><span class="method post">POST</span> /api/fixtures/{id}/result</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/fixtures/{id}/result</div>
+                            <div class="endpoint"><span class="method delete">DELETE</span> /api/fixtures/{id}/result</div>
+                        </div>
+                    </div>
+
+                    <div class="controller-card">
+                        <div class="controller-header">
+                            <h3>StatsController</h3>
+                            <span class="endpoint-count">8 endpoints</span>
+                        </div>
+                        <div class="endpoints-list">
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/player/{id}/batting</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/player/{id}/bowling</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/leaderboard/batting</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/leaderboard/bowling</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/club</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/season-fixture-averages</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/fixture-activity</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/stats/member-activity</div>
+                        </div>
+                    </div>
+
+                    <div class="controller-card">
+                        <div class="controller-header">
+                            <h3>MembersController</h3>
+                            <span class="endpoint-count">5 endpoints</span>
+                        </div>
+                        <div class="endpoints-list">
+                            <div class="endpoint"><span class="method get">GET</span> /api/members <span class="feature-tag">Paginated</span></div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/members/{id}</div>
+                            <div class="endpoint"><span class="method post">POST</span> /api/members</div>
+                            <div class="endpoint"><span class="method put">PUT</span> /api/members/{id}</div>
+                            <div class="endpoint"><span class="method delete">DELETE</span> /api/members/{id}</div>
+                        </div>
+                    </div>
+
+                    <div class="controller-card">
+                        <div class="controller-header">
+                            <h3>TeamsController</h3>
+                            <span class="endpoint-count">5 endpoints</span>
+                        </div>
+                        <div class="endpoints-list">
+                            <div class="endpoint"><span class="method get">GET</span> /api/teams</div>
+                            <div class="endpoint"><span class="method get">GET</span> /api/teams/{id}</div>
+                            <div class="endpoint"><span class="method post">POST</span> /api/teams</div>
+                            <div class="endpoint"><span class="method put">PUT</span> /api/teams/{id}</div>
+                            <div class="endpoint"><span class="method delete">DELETE</span> /api/teams/{id}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Snippets -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Code Examples</h2>
+                <p class="section-intro">Real code snippets demonstrating professional .NET development practices.</p>
+
+                <!-- Controller Example -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Thin Controller with Policy-Based Authorization</h3>
+                        <span class="file-path">FaziCricketClub.API/Controllers/SeasonsController.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class SeasonsController : ControllerBase
+{
+    private readonly ISeasonService _seasonService;
+
+    public SeasonsController(ISeasonService seasonService)
+    {
+        _seasonService = seasonService;
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "CanViewFixtures")]
+    public async Task&lt;ActionResult&lt;ApiResponse&lt;IEnumerable&lt;SeasonDto&gt;&gt;&gt;&gt; GetAllAsync(
+        CancellationToken cancellationToken)
+    {
+        var seasons = await _seasonService.GetAllAsync(cancellationToken);
+        return Ok(ApiResponse&lt;IEnumerable&lt;SeasonDto&gt;&gt;.Ok(seasons));
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "CanEditFixtures")]
+    public async Task&lt;ActionResult&lt;ApiResponse&lt;SeasonDto&gt;&gt;&gt; CreateAsync(
+        [FromBody] CreateSeasonDto request,
+        CancellationToken cancellationToken)
+    {
+        var season = await _seasonService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(
+            nameof(GetByIdAsync),
+            new { id = season.Id },
+            ApiResponse&lt;SeasonDto&gt;.Ok(season, "Season created successfully."));
+    }
+}</code></pre>
+                </div>
+
+                <!-- Service Layer Example -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Service Layer with Repository & Unit of Work</h3>
+                        <span class="file-path">FaziCricketClub.Application/Services/SeasonService.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class SeasonService : ISeasonService
+{
+    private readonly ISeasonRepository _seasonRepository;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public SeasonService(
+        ISeasonRepository seasonRepository,
+        IUnitOfWork unitOfWork,
+        IMapper mapper)
+    {
+        _seasonRepository = seasonRepository;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+
+    public async Task&lt;List&lt;SeasonDto&gt;&gt; GetAllAsync(CancellationToken cancellationToken)
+    {
+        var seasons = await _seasonRepository.GetAllAsync(cancellationToken);
+        var ordered = seasons.OrderBy(s => s.StartDate).ToList();
+        return _mapper.Map&lt;List&lt;SeasonDto&gt;&gt;(ordered);
+    }
+
+    public async Task&lt;SeasonDto&gt; CreateAsync(
+        CreateSeasonDto request,
+        CancellationToken cancellationToken)
+    {
+        var season = _mapper.Map&lt;Season&gt;(request);
+        await _seasonRepository.AddAsync(season, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return _mapper.Map&lt;SeasonDto&gt;(season);
+    }
+}</code></pre>
+                </div>
+
+                <!-- Repository Pattern -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Repository with Soft Delete Support</h3>
+                        <span class="file-path">FaziCricketClub.Infrastructure/Repositories/SeasonRepository.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class SeasonRepository : ISeasonRepository
+{
+    private readonly CricketClubDbContext _dbContext;
+
+    public SeasonRepository(CricketClubDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task&lt;List&lt;Season&gt;&gt; GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Seasons
+            .AsNoTracking()  // Read-only optimization
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task&lt;Season?&gt; GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Seasons
+            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+    }
+
+    public async Task AddAsync(Season season, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Seasons.AddAsync(season, cancellationToken);
+    }
+
+    // Soft delete - sets flag instead of removing
+    public void Remove(Season season)
+    {
+        season.IsDeleted = true;
+    }
+}</code></pre>
+                </div>
+
+                <!-- Stats Service Complex Logic -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Complex Statistics Aggregation</h3>
+                        <span class="file-path">FaziCricketClub.Application/Services/PlayerStatsService.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public async Task&lt;PlayerBattingStatsDto&gt; GetBattingStatsAsync(
+    int memberId,
+    int? seasonId = null,
+    CancellationToken cancellationToken = default)
+{
+    _logger.LogInformation(
+        "Calculating batting stats for MemberId={MemberId}, SeasonId={SeasonId}",
+        memberId, seasonId);
+
+    var member = await _memberRepository.GetByIdAsync(memberId, cancellationToken);
+    if (member is null || member.IsDeleted)
+        throw new KeyNotFoundException($"Member {memberId} was not found.");
+
+    var allScoresForSeason = await _battingScoreRepository
+        .GetForStatsAsync(seasonId, cancellationToken);
+    var playerScores = allScoresForSeason
+        .Where(x => x.MemberId == memberId)
+        .ToList();
+
+    // Calculate aggregated statistics
+    var matches = playerScores.Select(s => s.FixtureId).Distinct().Count();
+    var innings = playerScores.Count;
+    var notOuts = playerScores.Count(s => !s.IsOut);
+    var runs = playerScores.Sum(s => s.Runs);
+    var balls = playerScores.Sum(s => s.Balls);
+    var highScore = playerScores.Max(s => (int?)s.Runs) ?? 0;
+    var fours = playerScores.Sum(s => s.Fours);
+    var sixes = playerScores.Sum(s => s.Sixes);
+
+    // Calculate averages safely
+    var dismissals = innings - notOuts;
+    var average = dismissals > 0 ? (double)runs / dismissals : runs;
+    var strikeRate = balls > 0 ? (double)runs / balls * 100 : 0;
+
+    return new PlayerBattingStatsDto
+    {
+        MemberId = memberId,
+        MemberName = member.FullName,
+        Matches = matches,
+        Innings = innings,
+        NotOuts = notOuts,
+        Runs = runs,
+        HighScore = highScore,
+        Average = Math.Round(average, 2),
+        StrikeRate = Math.Round(strikeRate, 2),
+        Fours = fours,
+        Sixes = sixes
+    };
+}</code></pre>
+                </div>
+
+                <!-- EF Core Configuration -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>EF Core Fluent API Configuration</h3>
+                        <span class="file-path">FaziCricketClub.Infrastructure/Configurations/FixtureConfiguration.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class FixtureConfiguration : IEntityTypeConfiguration&lt;Fixture&gt;
+{
+    public void Configure(EntityTypeBuilder&lt;Fixture&gt; builder)
+    {
+        builder.HasKey(f => f.Id);
+
+        builder.Property(f => f.Venue)
+               .IsRequired()
+               .HasMaxLength(200);
+
+        builder.Property(f => f.CompetitionName)
+               .IsRequired()
+               .HasMaxLength(100);
+
+        builder.Property(f => f.Status)
+               .IsRequired()
+               .HasMaxLength(50);
+
+        builder.Property(f => f.IsDeleted)
+               .HasDefaultValue(false);
+
+        // Relationships with cascade rules
+        builder.HasOne(f => f.Season)
+               .WithMany(s => s.Fixtures)
+               .HasForeignKey(f => f.SeasonId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(f => f.HomeTeam)
+               .WithMany(t => t.HomeFixtures)
+               .HasForeignKey(f => f.HomeTeamId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(f => f.AwayTeam)
+               .WithMany(t => t.AwayFixtures)
+               .HasForeignKey(f => f.AwayTeamId)
+               .OnDelete(DeleteBehavior.Restrict);
+    }
+}</code></pre>
+                </div>
+
+                <!-- Middleware -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Global Exception Handling Middleware</h3>
+                        <span class="file-path">FaziCricketClub.API/Middleware/GlobalExceptionHandlingMiddleware.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class GlobalExceptionHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;GlobalExceptionHandlingMiddleware&gt; _logger;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            var correlationId = context.Items[CorrelationIdMiddleware.CorrelationIdItemKey] as string;
+
+            _logger.LogError(ex,
+                "Unhandled exception processing {Method} {Path} with CorrelationId={CorrelationId}",
+                context.Request?.Method,
+                context.Request?.Path.Value,
+                correlationId);
+
+            await WriteProblemDetailsResponseAsync(context, ex, correlationId);
+        }
+    }
+
+    private static async Task WriteProblemDetailsResponseAsync(
+        HttpContext context,
+        Exception exception,
+        string? correlationId)
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.ContentType = "application/problem+json";
+
+        var problem = new ProblemDetails
+        {
+            Status = context.Response.StatusCode,
+            Title = "An unexpected error occurred.",
+            Instance = context.Request?.Path.Value
+        };
+
+        if (!string.IsNullOrWhiteSpace(correlationId))
+            problem.Extensions["correlationId"] = correlationId;
+
+        var json = JsonSerializer.Serialize(problem,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        await context.Response.WriteAsync(json);
+    }
+}</code></pre>
+                </div>
+
+                <!-- Security Headers -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Security Headers Middleware</h3>
+                        <span class="file-path">FaziCricketClub.API/Middleware/SecurityHeadersMiddleware.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class SecurityHeadersMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        // Prevent MIME type sniffing
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+
+        // Prevent clickjacking attacks
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+
+        // XSS filtering
+        context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+
+        // Referrer policy
+        context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
+        // Content Security Policy
+        context.Response.Headers["Content-Security-Policy"] =
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';";
+
+        // HSTS - Force HTTPS
+        context.Response.Headers["Strict-Transport-Security"] =
+            "max-age=31536000; includeSubDomains";
+
+        await _next(context);
+    }
+}</code></pre>
+                </div>
+
+                <!-- FluentValidation -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>FluentValidation Implementation</h3>
+                        <span class="file-path">FaziCricketClub.Application/Validation/CreateSeasonDtoValidator.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">public class CreateSeasonDtoValidator : AbstractValidator&lt;CreateSeasonDto&gt;
+{
+    public CreateSeasonDtoValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Season name is required.")
+            .MaximumLength(100).WithMessage("Season name cannot exceed 100 characters.");
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.");
+
+        RuleFor(x => x.StartDate)
+            .NotEmpty().WithMessage("Start date is required.");
+
+        RuleFor(x => x.EndDate)
+            .NotEmpty().WithMessage("End date is required.")
+            .GreaterThan(x => x.StartDate)
+            .WithMessage("End date must be after start date.");
+    }
+}</code></pre>
+                </div>
+
+                <!-- Authorization Policies -->
+                <div class="code-showcase">
+                    <div class="code-header">
+                        <h3>Policy-Based Authorization Setup</h3>
+                        <span class="file-path">FaziCricketClub.API/Program.cs</span>
+                    </div>
+                    <pre><code class="language-csharp">builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanViewPlayers", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Players_View);
+    });
+
+    options.AddPolicy("CanEditPlayers", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Players_Edit);
+    });
+
+    options.AddPolicy("CanViewTeams", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Teams_View);
+    });
+
+    options.AddPolicy("CanEditTeams", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Teams_Edit);
+    });
+
+    options.AddPolicy("CanViewFixtures", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Fixtures_View);
+    });
+
+    options.AddPolicy("CanEditFixtures", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permission", AppPermissions.Fixtures_Edit);
+    });
+});</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Features -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Security Implementation</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128274;</div>
+                        <h3>JWT Authentication</h3>
+                        <p>Token-based authentication with configurable issuer, audience, and expiry validation</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128737;</div>
+                        <h3>Policy-Based Authorization</h3>
+                        <p>Claim-based permissions with role-agnostic access control policies</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128275;</div>
+                        <h3>Security Headers</h3>
+                        <p>HSTS, CSP, X-Frame-Options, XSS Protection headers on all responses</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#9202;</div>
+                        <h3>Rate Limiting</h3>
+                        <p>IP-based rate limiting (200 req/min) to prevent abuse and DDoS</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128209;</div>
+                        <h3>Correlation IDs</h3>
+                        <p>Request tracing with X-Correlation-Id header for debugging distributed systems</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#9989;</div>
+                        <h3>Input Validation</h3>
+                        <p>FluentValidation for comprehensive request validation with custom error messages</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Domain Entities -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Domain Model</h2>
+                <p class="section-intro">11 domain entities modeling cricket club operations with proper relationships and soft delete support.</p>
+
+                <div class="entity-grid">
+                    <div class="entity-card">
+                        <h3>Member</h3>
+                        <ul>
+                            <li>FullName, Email, PhoneNumber</li>
+                            <li>DateOfBirth, JoinedOn</li>
+                            <li>IsActive, IsDeleted</li>
+                            <li>Navigation: Teams, BattingScores, BowlingFigures</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>Team</h3>
+                        <ul>
+                            <li>Name, Description</li>
+                            <li>IsActive, IsDeleted</li>
+                            <li>Navigation: Members, HomeFixtures, AwayFixtures</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>Season</h3>
+                        <ul>
+                            <li>Name, Description</li>
+                            <li>StartDate, EndDate</li>
+                            <li>IsDeleted</li>
+                            <li>Navigation: Fixtures</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>Fixture</h3>
+                        <ul>
+                            <li>SeasonId, HomeTeamId, AwayTeamId</li>
+                            <li>StartDateTime, Venue</li>
+                            <li>CompetitionName, Status</li>
+                            <li>Navigation: MatchResult, Scores</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>MatchResult</h3>
+                        <ul>
+                            <li>HomeTeam/AwayTeam Runs, Wickets, Overs</li>
+                            <li>ResultSummary</li>
+                            <li>WinningTeamId</li>
+                            <li>PlayerOfTheMatchMemberId</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>BattingScore</h3>
+                        <ul>
+                            <li>MemberId, FixtureId, TeamId</li>
+                            <li>Runs, Balls, Fours, Sixes</li>
+                            <li>BattingOrder, IsOut</li>
+                            <li>DismissalType, DismissalBowler</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Response Patterns -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">API Response Patterns</h2>
+                <div class="response-examples">
+                    <div class="response-card">
+                        <h3>Standard Response Wrapper</h3>
+                        <pre><code class="language-json">{
+  "success": true,
+  "message": "Seasons retrieved successfully.",
+  "data": [
+    {
+      "id": 1,
+      "name": "2025 Summer",
+      "startDate": "2025-04-01",
+      "endDate": "2025-09-30"
+    }
+  ],
+  "errors": null
+}</code></pre>
+                    </div>
+                    <div class="response-card">
+                        <h3>Paginated Response</h3>
+                        <pre><code class="language-json">{
+  "success": true,
+  "data": {
+    "items": [...],
+    "totalCount": 150,
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalPages": 15,
+    "hasPrevious": false,
+    "hasNext": true
+  }
+}</code></pre>
+                    </div>
+                    <div class="response-card">
+                        <h3>Error Response (RFC 7807)</h3>
+                        <pre><code class="language-json">{
+  "status": 500,
+  "title": "An unexpected error occurred.",
+  "detail": "An error occurred processing the request.",
+  "instance": "/api/members/123",
+  "correlationId": "abc-123-def"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section summary-section">
+            <div class="container">
+                <h2 class="section-title">Backend Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-number">7</span>
+                        <span class="summary-label">API Controllers</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">30+</span>
+                        <span class="summary-label">REST Endpoints</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">11</span>
+                        <span class="summary-label">Domain Entities</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">7</span>
+                        <span class="summary-label">Repositories</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">7</span>
+                        <span class="summary-label">Application Services</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">4</span>
+                        <span class="summary-label">Middleware Components</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">&#9918;</span>
+                    <span>FaziCricketClub Demo</span>
+                </div>
+                <div class="footer-attribution">
+                    <p>&copy; 2025 Faz Ahmed. All rights reserved.</p>
+                    <p>Development & Architecture by <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed - dotnetdeveloper.co.uk</a></p>
+                </div>
+                <div class="footer-ip">
+                    <p class="ip-notice">The architectural design, code patterns, and technical implementation showcased in this demo were developed by Faz Ahmed. While client-specific business logic and data have been removed for confidentiality, the technical architecture and development approach are the intellectual work of Faz Ahmed.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

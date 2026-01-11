@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaziCricketClub - Full Stack Demo | Faz Ahmed</title>
+    <meta name="description" content="A full-stack cricket club management system built with ASP.NET Core 10 and Angular 20. Showcasing Clean Architecture, JWT authentication, and modern development patterns.">
+    <meta name="author" content="Faz Ahmed">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">&#9918;</span>
+                <span>FaziCricketClub</span>
+            </a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">Overview</a>
+                <a href="backend.html">Backend</a>
+                <a href="frontend.html">Frontend</a>
+            </nav>
+            <div class="developer-badge">
+                <span>Developed by</span>
+                <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge">Full Stack .NET + Angular Application</div>
+                <h1>FaziCricketClub</h1>
+                <p class="hero-subtitle">A comprehensive cricket club management system demonstrating enterprise-grade architecture, modern development patterns, and full-stack expertise.</p>
+
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">9</span>
+                        <span class="hero-stat-label">.NET Projects</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">20+</span>
+                        <span class="hero-stat-label">Angular Components</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">30+</span>
+                        <span class="hero-stat-label">API Endpoints</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">11</span>
+                        <span class="hero-stat-label">Domain Entities</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Disclaimer -->
+        <section class="disclaimer-banner">
+            <div class="container">
+                <div class="disclaimer-content">
+                    <span class="disclaimer-icon">&#9888;</span>
+                    <div>
+                        <strong>Demo Version Notice:</strong> This is a sanitized demonstration version of a production application. Due to security protocols and client privacy policies, sensitive business logic, proprietary algorithms, and confidential configurations have been removed. The technical architecture and patterns demonstrated are authentic work by Faz Ahmed.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Overview -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Technology Stack</h2>
+                <p class="section-intro">Built with cutting-edge technologies and industry best practices for scalability, maintainability, and performance.</p>
+
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">.NET</div>
+                        <h3>ASP.NET Core 10</h3>
+                        <p>Latest .NET framework with high-performance APIs, native dependency injection, and cross-platform support</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">NG</div>
+                        <h3>Angular 20</h3>
+                        <p>Modern frontend framework with signals, standalone components, and reactive state management</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">EF</div>
+                        <h3>Entity Framework Core</h3>
+                        <p>ORM with code-first migrations, fluent API configuration, and optimized query patterns</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">JWT</div>
+                        <h3>JWT Authentication</h3>
+                        <p>Token-based authentication with role and permission claims for secure access control</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">SQL</div>
+                        <h3>SQL Server</h3>
+                        <p>Enterprise database with proper indexing, relationships, and query optimization</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">UI</div>
+                        <h3>Angular Material</h3>
+                        <p>Material Design components with TailwindCSS for responsive, accessible interfaces</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Highlights -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Architecture Highlights</h2>
+                <p class="section-intro">Enterprise patterns and clean code principles ensuring maintainability and testability.</p>
+
+                <div class="pattern-grid">
+                    <div class="pattern-card">
+                        <h3>Clean Architecture</h3>
+                        <p>Layered solution with Domain, Application, Infrastructure, and Presentation tiers following SOLID principles</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Repository Pattern</h3>
+                        <p>Abstracted data access layer enabling unit testing and database provider flexibility</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Unit of Work</h3>
+                        <p>Transaction coordination across multiple repositories for data consistency</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>CQRS-Ready Services</h3>
+                        <p>Separated read/write operations with distinct DTOs for optimized data flow</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Policy-Based Auth</h3>
+                        <p>Claim-based authorization with granular permission policies (View/Edit per feature)</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Signal-Based State</h3>
+                        <p>Modern Angular signals for reactive, fine-grained state management without RxJS complexity</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>Soft Delete Pattern</h3>
+                        <p>Global query filters for logical deletion preserving data integrity and audit trails</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h3>FluentValidation</h3>
+                        <p>Declarative validation rules with custom messages and complex business logic support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Overview -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Application Features</h2>
+                <p class="section-intro">Comprehensive cricket club management covering members, teams, fixtures, and statistics.</p>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128101;</div>
+                        <h3>Member Management</h3>
+                        <p>Full CRUD operations with search, filtering, pagination, and CSV export capabilities</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#127942;</div>
+                        <h3>Team Organization</h3>
+                        <p>Multiple team support (1st XI, 2nd XI, U19, Veterans, Women's) with roster management</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128197;</div>
+                        <h3>Fixture Scheduling</h3>
+                        <p>Season-based fixture management with venue, competition, and status tracking</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128202;</div>
+                        <h3>Match Statistics</h3>
+                        <p>Detailed scorecards with batting/bowling figures, player of the match, and result summaries</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#127941;</div>
+                        <h3>Leaderboards</h3>
+                        <p>Player rankings by runs, wickets, batting average, and bowling economy</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128200;</div>
+                        <h3>Analytics Dashboard</h3>
+                        <p>Club-wide statistics, performance trends, and visual data representations</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128272;</div>
+                        <h3>Role-Based Access</h3>
+                        <p>Admin, Captain, and Player roles with granular feature permissions</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#127769;</div>
+                        <h3>Dark Mode</h3>
+                        <p>System-aware theme switching with persistent user preferences</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Structure -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Solution Structure</h2>
+                <p class="section-intro">9 .NET projects following Clean Architecture with clear separation of concerns.</p>
+
+                <div class="entity-grid">
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.Domain</h3>
+                        <ul>
+                            <li>Core domain entities</li>
+                            <li>Entity base classes</li>
+                            <li>Domain interfaces</li>
+                            <li>No external dependencies</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.Application</h3>
+                        <ul>
+                            <li>Business logic services</li>
+                            <li>DTOs and mapping profiles</li>
+                            <li>FluentValidation validators</li>
+                            <li>Service interfaces</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.Infrastructure</h3>
+                        <ul>
+                            <li>EF Core DbContext</li>
+                            <li>Repository implementations</li>
+                            <li>Entity configurations</li>
+                            <li>Database migrations</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.API</h3>
+                        <ul>
+                            <li>REST API controllers</li>
+                            <li>Middleware pipeline</li>
+                            <li>JWT configuration</li>
+                            <li>Rate limiting & CORS</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.IdentityApi</h3>
+                        <ul>
+                            <li>Authentication endpoints</li>
+                            <li>User/role management</li>
+                            <li>Token service</li>
+                            <li>Permission seeding</li>
+                        </ul>
+                    </div>
+                    <div class="entity-card">
+                        <h3>FaziCricketClub.Frontend</h3>
+                        <ul>
+                            <li>Angular 20 SPA</li>
+                            <li>20+ feature components</li>
+                            <li>Material UI + TailwindCSS</li>
+                            <li>Reactive services</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Features -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Security Implementation</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128274;</div>
+                        <h3>JWT Authentication</h3>
+                        <p>Symmetric key signing with issuer/audience validation and configurable expiry</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128737;</div>
+                        <h3>Claim-Based Authorization</h3>
+                        <p>Granular permissions (Players_View, Teams_Edit, Admin_ManageUsers)</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#9202;</div>
+                        <h3>Rate Limiting</h3>
+                        <p>IP-based request throttling (200/min global, 10/min auth endpoints)</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128275;</div>
+                        <h3>Security Headers</h3>
+                        <p>HSTS, CSP, X-Frame-Options, X-Content-Type-Options on all responses</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128209;</div>
+                        <h3>Correlation IDs</h3>
+                        <p>Request tracing with X-Correlation-Id for distributed debugging</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">&#128272;</div>
+                        <h3>Account Lockout</h3>
+                        <p>5 failed attempts triggers 5-minute lockout to prevent brute force</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Explore the Technical Details</h2>
+                <p>Dive deeper into the backend architecture and frontend implementation patterns.</p>
+                <div class="cta-buttons">
+                    <a href="backend.html" class="btn btn-primary">
+                        <span>Backend Architecture</span>
+                        <span>&#8594;</span>
+                    </a>
+                    <a href="frontend.html" class="btn btn-secondary">
+                        <span>Frontend Features</span>
+                        <span>&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">&#9918;</span>
+                    <span>FaziCricketClub Demo</span>
+                </div>
+                <div class="footer-attribution">
+                    <p>&copy; 2025 Faz Ahmed. All rights reserved.</p>
+                    <p>Development & Architecture by <a href="https://dotnetdeveloper.co.uk" target="_blank" rel="noopener">Faz Ahmed - dotnetdeveloper.co.uk</a></p>
+                </div>
+                <div class="footer-ip">
+                    <p class="ip-notice">The architectural design, code patterns, and technical implementation showcased in this demo were developed by Faz Ahmed. While client-specific business logic and data have been removed for confidentiality, the technical architecture and development approach are the intellectual work of Faz Ahmed.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
